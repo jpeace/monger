@@ -1,0 +1,40 @@
+./config/monger/config.rb
+database 'my_db'
+host 'localhost'
+port 21010
+modules Domain, SomeOther::Module
+maps :maps, :other_maps
+
+./config/monger/maps.rb
+map User do |u|
+  u.all_properties
+  u.exclude(:full_name)
+  u.has_many :posts
+end
+
+module Domain
+  class User
+    include Monger::active_record
+
+    attr_accessor :name, :age, :gender
+  end
+
+  class Post
+  end
+end
+
+Monger.bootstrap 'config/monger'
+
+
+ctx = Monger.context
+ctx.find :user, :name => 'jarrod', :limit => 10
+ctx.find :user, do
+  where :name => 'jarrod'
+  limit 10
+end
+u = User.new
+ctx.save u
+
+User.find
+User.save 
+etc

@@ -1,0 +1,9 @@
+Gemfile
+Gemfile.lock
+Manifest
+README.rdoc
+Rakefile
+lib/monger.rb
+lib/monger/version.rb
+monger.gemspec
+spec/spec_helper.rb

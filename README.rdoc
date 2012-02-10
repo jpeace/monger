@@ -1,0 +1,3 @@
+= Monger
+
+Super simple ODM for Mongo
