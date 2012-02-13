@@ -1,11 +1,13 @@
 module Domain
-  class Post
+  class BlogPost
     attr_accessor :title, :author, :body
   end
 end
 
-module Auth
-  class User
-    attr_accessor :name, :age, :gender
+module Domain
+  module Auth
+    class User
+      attr_accessor :name, :age, :gender
+    end
   end
 end

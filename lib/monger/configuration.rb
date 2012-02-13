@@ -1,3 +1,5 @@
+require 'monger/dsl/configuration_expression'
+
 module Monger
   class Configuration
     attr_accessor :host, :port, :database, :modules, :maps
@@ -9,34 +11,8 @@ module Monger
     end
 
     def initialize(script)
-      dsl = ConfigurationExpression.new(self)
+      dsl = Dsl::ConfigurationExpression.new(self)
       dsl.instance_eval(script)    
-    end
-  end
-
-  class ConfigurationExpression
-    def initialize(config)
-      @config = config
-    end
-
-    def host(host)
-      @config.host = host
-    end
-
-    def database(database)
-      @config.database = database
-    end
-
-    def port(port)
-      @config.port = port
-    end
-
-    def modules(*modules)
-      @config.modules = modules
-    end
-
-    def maps(*maps)
-      @config.maps = maps
     end
   end
 end

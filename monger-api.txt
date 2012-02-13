@@ -6,7 +6,7 @@ modules Domain, SomeOther::Module
 maps :maps, :other_maps
 
 ./config/monger/maps.rb
-map User do |u|
+map :user do |u|
   u.all_properties
   u.exclude(:full_name)
   u.has_many :posts
