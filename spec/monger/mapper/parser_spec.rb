@@ -1,6 +1,6 @@
-require 'monger/mapper/parser'
+require 'monger/mapping/parser'
 
-describe Monger::Mapper::Parser do
+describe Monger::Mapping::Parser do
   include Mocks
 
   subject {described_class.new(config)}
@@ -44,7 +44,7 @@ map Domain::Auth::User do |u|
   u.has_many :posts
 end}    
     
-    it "immediately tranforms" do
+    it "immediately transforms" do
       subject.script.should eq transformed_from_file
     end
   end

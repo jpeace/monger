@@ -1,5 +1,5 @@
 module Monger
-  module Mapper
+  module Mapping
     class Parser
       attr_reader :script
 
@@ -20,16 +20,8 @@ module Monger
         transformed = ''
         script.each_line do |line|
           if line[/map :(\w+) do \|(\w+)\|/, 1]
-            class_name = $~[1]
+            class_name = $~[1].build_class_name
             block_param = $~[2]
-            
-            # Tranform symbol to class name
-            separator = /_(\w)/
-            class_name.scan(separator).count.times do
-              pieces = class_name.partition(separator)
-              class_name = pieces[0] + $~[1].upcase + pieces[2]
-            end
-            class_name[0] = class_name[0].upcase
 
             # Find class in configured modules
             found_in = nil

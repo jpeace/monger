@@ -1,3 +1,5 @@
+require 'monger/mapping/map'
+
 module Monger
   module Dsl
     class MappingExpression
@@ -5,7 +7,8 @@ module Monger
         @mapper = mapper
       end
 
-      def map
+      def map(entity)
+        @mapper.maps[]
       end
     end
   end
