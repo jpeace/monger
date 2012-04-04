@@ -8,11 +8,11 @@ module Monger
       end
 
       def add_property(name, options={})
-        type = options[:type] || Monger::Config::PropertyTypes::Direct
+        mode = options[:mode] || Monger::Config::PropertyModes::Direct
         klass = options[:klass] || nil
         @properties[name] = Property.new do |p|
           p.name = name
-          p.type = type
+          p.mode = mode
           p.klass = klass
         end
       end

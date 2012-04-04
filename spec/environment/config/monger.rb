@@ -1,6 +1,6 @@
-database 'my_db'
+database 'monger-test'
 host 'localhost'
-port 8888
+port 27017
 modules Domain, Domain::Auth
 
 map :blog_post do |p|

@@ -1,3 +1,5 @@
+require 'monger/dsl/mapping_expression'
+
 module Monger
   module Dsl
     class ConfigurationExpression

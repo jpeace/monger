@@ -6,7 +6,7 @@ end
 
 module Monger
   module Config
-    module PropertyTypes
+    module PropertyModes
       Direct = 0
       Reference = 1
       Collection = 2
@@ -14,7 +14,8 @@ module Monger
   end
 
   class Configuration
-    attr_accessor :host, :port, :database, :modules, :maps
+    attr_accessor :host, :port, :database, :modules
+    attr_reader :maps
 
     def self.from_file(path)
       File.open(path, 'r') do |file|
