@@ -9,7 +9,6 @@ describe Monger::Configuration do
       subject.host.should eq 'localhost'
       subject.port.should eq 8888
       [Domain, Domain::Auth].each {|mod| subject.modules.should include(mod)}
-      subject.maps.should include(:map)
     end
   end  
 end

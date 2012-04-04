@@ -11,8 +11,22 @@ module Monger
     end
 
     def initialize(script)
+      @maps = {}
       dsl = Dsl::ConfigurationExpression.new(self)
       dsl.instance_eval(script)    
+    end
+
+    def build_class_of_type(type)
+      klass = nil
+      @modules.each do |mod|
+        begin
+          klass = mod.const_get(type.build_class_name)
+          return klass.new
+        rescue
+          # Constant doesn't exist i.e. class is not in this module
+        end
+      end
+      raise ArgumentError
     end
   end
 end

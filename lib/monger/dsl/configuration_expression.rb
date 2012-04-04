@@ -21,8 +21,10 @@ module Monger
         @config.modules = modules
       end
 
-      def maps(*maps)
-        @config.maps = maps
+      def map(type)
+        dsl = MappingExpression.new(@config, type)
+        yield dsl
+        @config.maps[type] = dsl.map
       end
     end
   end
