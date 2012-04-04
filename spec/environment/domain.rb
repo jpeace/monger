@@ -1,10 +1,12 @@
 module Domain
   class BlogPost
-    attr_accessor :title, :author, :body
+    attr_accessor :title, :author, :body, :comments
   end
-end
 
-module Domain
+  class Comment
+    attr_accessor :user, :message
+  end
+
   module Auth
     class User
       attr_accessor :name, :age, :gender

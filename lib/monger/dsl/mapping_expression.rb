@@ -1,26 +1,31 @@
-require 'monger/mapping/map'
+require 'monger/config/map'
 
 module Monger
   module Dsl
     class MappingExpression
       attr_reader :map
       
-      def initialize(configuration, type)
-        @type = type
-        @map = Monger::Mapping::Map.new
-        @klass = configuration.build_class_of_type type
+      def initialize(config, type)
+        @config = config
+        @map = Monger::Config::Map.new
       end
 
-      def all_properties
+      def properties(*names)
+        names.each do |name|
+          @map.add_property(name)
+        end
       end
 
-      def exclude(type)
+      def has_a(name, options={})
+        raise ArgumentError if options[:type].nil?
+        klass = @config.find_class(options[:type])
+        @map.add_property(name, :klass => klass, :type => Monger::Config::PropertyTypes::Reference)
       end
 
-      def has_a(type, options={})
-      end
-
-      def has_many(type, options={})
+      def has_many(name, options={})
+        raise ArgumentError if options[:type].nil?
+        klass = @config.find_class(options[:type])
+        @map.add_property(name, :klass => klass, :type => Monger::Config::PropertyTypes::Collection)
       end
     end
   end

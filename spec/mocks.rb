@@ -1,7 +1,13 @@
+require 'monger/config'
+
 module Mocks
+  class ConfigMock < Monger::Configuration
+    def initialize
+      @modules = [Domain::Auth, Domain]
+    end
+  end
+
   def config
-    c = double("Configuration")
-    c.stub(:modules) {[Domain::Auth, Domain]}
-    c
+    ConfigMock.new
   end
 end
