@@ -1,4 +1,3 @@
-require 'monger/config'
 require 'monger/dsl/mapping_expression'
 
 include Mocks

@@ -1,5 +1,3 @@
-require 'monger/config'
-
 describe Monger::Configuration do
   context "when initializing from a file" do
     subject {described_class.from_file("#{environment_root}/config/monger.rb")}

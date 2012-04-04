@@ -1,5 +1,3 @@
-require 'monger/patches'
-
 class SingleClass
 end
 

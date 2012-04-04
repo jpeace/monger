@@ -1,6 +1,7 @@
 require 'monger/context'
 require 'monger/patches'
 require 'monger/config'
+require 'monger/mapping'
 require 'monger/version'
 
 module Monger
