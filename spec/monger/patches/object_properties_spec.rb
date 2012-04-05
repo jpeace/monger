@@ -71,7 +71,7 @@ describe "Object property patches" do
   end
 
   context "using all properties" do
-    it "iterates through initialized accessors`" do
+    it "iterates through initialized accessors" do
       mixed.all_properties.count.should eq 1
       mixed.all_properties.should include(:prop1)
     end

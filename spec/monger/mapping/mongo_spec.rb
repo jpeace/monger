@@ -53,7 +53,49 @@ describe Monger::Mapping::Mongo do
     subject.save(:blog_post, post, :atomic => true)
     post.mongo_id.should_not be_nil
     doc = find_in_db(:blog_post, post.mongo_id)
-    puts doc.inspect
     doc['title'].should eq 'New Post'
+
+    # Reference
+    post.author = Domain::Auth::User.new do |u|
+      u.name = 'John Doe'
+    end
+    subject.save(:blog_post, post, :atomic => true)
+    post.author.mongo_id.should_not be_nil
+    doc = find_in_db(:blog_post, post.mongo_id)
+    doc['author_id'].should eq post.author.mongo_id
+    doc = find_in_db(:user, post.author.mongo_id)
+    doc['name'].should eq 'John Doe'
+
+    # Collections
+    post.comments = [Domain::Comment.new {|c| c.message = 'Comment!'}]
+    subject.save(:blog_post, post, :atomic => true)
+    comment = post.comments.first
+    comment.mongo_id.should_not be_nil
+    doc = find_in_db(:comment, comment.mongo_id)
+    doc['message'].should eq 'Comment!'
+  end
+
+  it "updates direct properties" do
+    post = Domain::BlogPost.new do |p|
+      p.title = 'New Post'
+    end
+    subject.save(:blog_post, post, :atomic => true)
+    post.title = 'Changed Title'
+    subject.save(:blog_post, post, :atomic => true)
+    doc = find_in_db(:blog_post, post.mongo_id)
+    doc['title'].should eq 'Changed Title'
+  end
+
+  it "does not update indirect properties" do
+    post = Domain::BlogPost.new do |p|
+      p.author = Domain::Auth::User.new do |u|
+        u.name = 'John Doe'
+      end
+    end
+    subject.save(:blog_post, post, :atomic => true)
+    post.author.name = 'New Name'
+    subject.save(:blog_post, post, :atomic => true)
+    doc = find_in_db(:user, post.author.mongo_id)
+    doc['name'].should eq 'John Doe'
   end
 end

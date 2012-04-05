@@ -26,7 +26,6 @@ module Database
   @@db['comment'].insert(comment2)
 
   def find_in_db(type, id)
-    puts id.inspect
     @@db[type.to_s].find({'_id' => id}).first
   end
 end

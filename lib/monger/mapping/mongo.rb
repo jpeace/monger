@@ -98,11 +98,6 @@ module Monger
           when Monger::Config::PropertyModes::Collection
             coll = []
             
-            # ref_prop = @config.maps[prop.type].properties.values.find {|p| 
-            #   p.mode == Monger::Config::PropertyModes::Reference && p.type == type
-            # }
-            # ref_prop_name = ref_prop.nil? ? type.to_s : ref_prop.name
-
             docs = @db.find(prop.type, {"#{prop.ref_name}_id" => mongo_doc.mongo_id})
             docs.each do |doc|
               mapped = self.to_entity(prop.type, doc, :depth => depth-1) 
