@@ -1,7 +1,11 @@
 class Hash
   def mongo_id
-    self['_id'] unless self['_id'].nil?
+    return self['_id'] unless self['_id'].nil?
     self[:_id]
+  end
+
+  def mongo_id=(value)
+    self['_id'] = value
   end
 end
 

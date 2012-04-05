@@ -11,6 +11,7 @@ end
 
 map :user do |u|
   u.properties :name, :age, :gender
+  u.has_many :posts, :type => :blog_post
 end
 
 map :comment do |c|

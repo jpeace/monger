@@ -15,7 +15,7 @@ module Domain
 
   module Auth
     class User
-      attr_accessor :name, :age, :gender
+      attr_accessor :name, :age, :gender, :posts
       def initialize
         yield self if block_given?
       end
