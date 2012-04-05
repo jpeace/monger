@@ -26,5 +26,6 @@ describe Monger::Dsl::MappingExpression do
     property.name.should eq :comments
     property.mode.should eq Monger::Config::PropertyModes::Collection
     property.klass.should eq Domain::Comment
+    property.ref_name.should eq :blog_post
   end
 end

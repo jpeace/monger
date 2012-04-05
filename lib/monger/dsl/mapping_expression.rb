@@ -7,6 +7,7 @@ module Monger
       
       def initialize(config, type)
         @config = config
+        @type = type
         @map = Monger::Config::Map.new
       end
 
@@ -25,7 +26,8 @@ module Monger
       def has_many(name, options={})
         raise ArgumentError if options[:type].nil?
         klass = @config.find_class(options[:type])
-        @map.add_property(name, :klass => klass, :mode => Monger::Config::PropertyModes::Collection)
+        ref_name = options[:ref_name] || @type
+        @map.add_property(name, :klass => klass, :mode => Monger::Config::PropertyModes::Collection, :ref_name => ref_name)
       end
     end
   end

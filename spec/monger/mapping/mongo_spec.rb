@@ -1,3 +1,5 @@
+include Database
+
 describe Monger::Mapping::Mongo do
   subject {described_class.new(Mocks::real_config)}
 
@@ -11,9 +13,9 @@ describe Monger::Mapping::Mongo do
     post.title.should eq 'Blog Post'
   end
 
-  it "adds an id method" do
+  it "adds a mongo id" do
     post = subject.find_by_id(:blog_post, Database::blog_post_id)
-    post.id.should eq Database::blog_post_id.to_mongo_id
+    post.mongo_id.should eq Database::blog_post_id.to_mongo_id
   end
 
   it "maps direct properties" do
@@ -42,5 +44,16 @@ describe Monger::Mapping::Mongo do
     post = subject.find_by_id(:blog_post, Database::blog_post_id, :depth => 2)
     post.author.posts.first.title.should eq 'Blog Post'
     post.author.posts.first.author.should be_nil
+  end
+
+  it "inserts new entities" do
+    post = Domain::BlogPost.new do |p|
+      p.title = 'New Post'
+    end
+    subject.save(:blog_post, post, :atomic => true)
+    post.mongo_id.should_not be_nil
+    doc = find_in_db(:blog_post, post.mongo_id)
+    puts doc.inspect
+    doc['title'].should eq 'New Post'
   end
 end
