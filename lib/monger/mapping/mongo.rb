@@ -26,7 +26,7 @@ module Monger
         end
 
         def update(type, doc, options={})
-          @db[type.to_s].update({'_id'=>doc.mongo_id}, doc)
+          @db[type.to_s].update({'_id'=>doc.monger_id}, doc)
           @db.get_last_error if options[:atomic]
         end
       end
@@ -37,17 +37,19 @@ module Monger
       end
 
       def find_by_id(type, id, options={})
-        id = id.to_mongo_id if id.is_a? String
+        id = id.to_monger_id if id.is_a? String
         to_entity(type, @db.find_by_id(type, id), options)
       end
 
-      def save(type, entity, options={})
+      def save(entity, options={})
+        type = entity.class.build_symbol
+
         doc = {}
-        if entity.mongo_id.nil?
+        if entity.monger_id.nil?
           @db.insert(type, doc)
-          entity.mongo_id = doc.mongo_id
+          entity.monger_id = doc.monger_id
         else
-          doc.mongo_id = entity.mongo_id
+          doc.monger_id = entity.monger_id
         end
         
         map = @config.maps[type]
@@ -59,12 +61,12 @@ module Monger
           when Monger::Config::PropertyModes::Direct
             doc[name.to_s] = value
           when Monger::Config::PropertyModes::Reference
-            self.save(prop.type, value) if value.mongo_id.nil?
-            doc["#{name}_id"] = value.mongo_id
+            self.save(value) if value.monger_id.nil?
+            doc["#{name}_id"] = value.monger_id
           when Monger::Config::PropertyModes::Collection
             value.each do |el|
-              if el.mongo_id.nil?
-                self.save(prop.type, el, :extra => {"#{prop.ref_name}_id" => entity.mongo_id})
+              if el.monger_id.nil?
+                self.save(el, :extra => {"#{prop.ref_name}_id" => entity.monger_id})
               end
             end
           end  
@@ -84,7 +86,7 @@ module Monger
         return nil if depth < 0
 
         obj = @config.build_object_of_type(type)
-        obj.mongo_id = mongo_doc.mongo_id
+        obj.monger_id = mongo_doc.monger_id
         
         map = @config.maps[type]
 
@@ -98,7 +100,7 @@ module Monger
           when Monger::Config::PropertyModes::Collection
             coll = []
             
-            docs = @db.find(prop.type, {"#{prop.ref_name}_id" => mongo_doc.mongo_id})
+            docs = @db.find(prop.type, {"#{prop.ref_name}_id" => mongo_doc.monger_id})
             docs.each do |doc|
               mapped = self.to_entity(prop.type, doc, :depth => depth-1) 
               coll << mapped unless mapped.nil?

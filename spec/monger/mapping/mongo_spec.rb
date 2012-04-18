@@ -9,13 +9,13 @@ describe Monger::Mapping::Mongo do
   end
 
   it "works with mongo ids, too" do
-    post = subject.find_by_id(:blog_post, Database::blog_post_id.to_mongo_id)
+    post = subject.find_by_id(:blog_post, Database::blog_post_id.to_monger_id)
     post.title.should eq 'Blog Post'
   end
 
   it "adds a mongo id" do
     post = subject.find_by_id(:blog_post, Database::blog_post_id)
-    post.mongo_id.should eq Database::blog_post_id.to_mongo_id
+    post.monger_id.should eq Database::blog_post_id.to_monger_id
   end
 
   it "maps direct properties" do
@@ -50,28 +50,28 @@ describe Monger::Mapping::Mongo do
     post = Domain::BlogPost.new do |p|
       p.title = 'New Post'
     end
-    subject.save(:blog_post, post, :atomic => true)
-    post.mongo_id.should_not be_nil
-    doc = find_in_db(:blog_post, post.mongo_id)
+    subject.save(post, :atomic => true)
+    post.monger_id.should_not be_nil
+    doc = find_in_db(:blog_post, post.monger_id)
     doc['title'].should eq 'New Post'
 
     # Reference
     post.author = Domain::Auth::User.new do |u|
       u.name = 'John Doe'
     end
-    subject.save(:blog_post, post, :atomic => true)
-    post.author.mongo_id.should_not be_nil
-    doc = find_in_db(:blog_post, post.mongo_id)
-    doc['author_id'].should eq post.author.mongo_id
-    doc = find_in_db(:user, post.author.mongo_id)
+    subject.save(post, :atomic => true)
+    post.author.monger_id.should_not be_nil
+    doc = find_in_db(:blog_post, post.monger_id)
+    doc['author_id'].should eq post.author.monger_id
+    doc = find_in_db(:user, post.author.monger_id)
     doc['name'].should eq 'John Doe'
 
     # Collections
     post.comments = [Domain::Comment.new {|c| c.message = 'Comment!'}]
-    subject.save(:blog_post, post, :atomic => true)
+    subject.save(post, :atomic => true)
     comment = post.comments.first
-    comment.mongo_id.should_not be_nil
-    doc = find_in_db(:comment, comment.mongo_id)
+    comment.monger_id.should_not be_nil
+    doc = find_in_db(:comment, comment.monger_id)
     doc['message'].should eq 'Comment!'
   end
 
@@ -79,10 +79,10 @@ describe Monger::Mapping::Mongo do
     post = Domain::BlogPost.new do |p|
       p.title = 'New Post'
     end
-    subject.save(:blog_post, post, :atomic => true)
+    subject.save(post, :atomic => true)
     post.title = 'Changed Title'
-    subject.save(:blog_post, post, :atomic => true)
-    doc = find_in_db(:blog_post, post.mongo_id)
+    subject.save(post, :atomic => true)
+    doc = find_in_db(:blog_post, post.monger_id)
     doc['title'].should eq 'Changed Title'
   end
 
@@ -92,10 +92,10 @@ describe Monger::Mapping::Mongo do
         u.name = 'John Doe'
       end
     end
-    subject.save(:blog_post, post, :atomic => true)
+    subject.save(post, :atomic => true)
     post.author.name = 'New Name'
-    subject.save(:blog_post, post, :atomic => true)
-    doc = find_in_db(:user, post.author.mongo_id)
+    subject.save(post, :atomic => true)
+    doc = find_in_db(:user, post.author.monger_id)
     doc['name'].should eq 'John Doe'
   end
 end
