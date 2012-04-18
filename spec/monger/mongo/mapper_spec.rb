@@ -1,6 +1,6 @@
 include Database
 
-describe Monger::Mapping::Mongo do
+describe Monger::Mongo::Mapper do
   subject {described_class.new(Mocks::real_config)}
 
   it "finds entities by id" do

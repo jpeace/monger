@@ -1,20 +1,17 @@
-require 'monger/context'
 require 'monger/patches'
 require 'monger/config'
-require 'monger/mapping'
+require 'monger/session'
+require 'monger/mongo'
 require 'monger/version'
 
 module Monger
-  
   class << self
-    def context
-      @context
+    def bootstrap(config_file='config/monger.rb')
+      Configuration.new("#{Dir.pwd}/#{config_file}")
     end
 
-    def bootstrap(config_folder='config/monger')
-      config = Configuration.new("#{Dir.pwd}/#{config_folder}/config.rb")
-      @context = Context.new
+    def create_session(config)
+      Session.new(config)
     end
   end
-
 end

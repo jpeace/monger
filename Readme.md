@@ -4,7 +4,7 @@ Super simple object mapper for Mongo/Ember/??
 
 ## Terminology
 
-* Config - A configuration object representing entities and their relationships
+* Configuration - An object representing entities and their relationships
 * Session - Main entry point for Monger API, provides access to mappers
 * Mapper - Responsible for serializing/deserializing entities to a particular format
 
