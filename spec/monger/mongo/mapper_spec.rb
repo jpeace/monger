@@ -86,7 +86,7 @@ describe Monger::Mongo::Mapper do
     doc['title'].should eq 'Changed Title'
   end
 
-  it "does not update indirect properties" do
+  it "does not update indirect properties by default" do
     post = Domain::BlogPost.new do |p|
       p.author = Domain::Auth::User.new do |u|
         u.name = 'John Doe'
@@ -97,5 +97,16 @@ describe Monger::Mongo::Mapper do
     subject.save(post, :atomic => true)
     doc = find_in_db(:user, post.author.monger_id)
     doc['name'].should eq 'John Doe'
+  end
+
+  it "updates indirect properties when they are marked with the :update option" do
+    post = Domain::BlogPost.new do |p|
+      p.comments = [Domain::Comment.new {|c| c.message = 'Comment!'}]
+    end
+    subject.save(post, :atomic => true)
+    post.comments[0].message = 'New!'
+    subject.save(post, :atomic => true)
+    doc = find_in_db(:comment, post.comments[0].monger_id)
+    doc['message'].should eq 'New!'
   end
 end

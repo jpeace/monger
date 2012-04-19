@@ -6,7 +6,7 @@ modules Domain, Domain::Auth
 map :blog_post do |p|
   p.properties :title, :body
   p.has_a :author, :type => :user
-  p.has_many :comments, :type => :comment
+  p.has_many :comments, :type => :comment, :update => true
 end
 
 map :user do |u|

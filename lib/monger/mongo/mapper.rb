@@ -6,9 +6,17 @@ module Monger
         @db = Database.new(config)
       end
 
+      def find_all(type, options={})
+        @db.find_all(type).map {|doc| doc_to_entity(type, doc, options)}
+      end
+
       def find_by_id(type, id, options={})
         id = id.to_monger_id if id.is_a? String
-        to_entity(type, @db.find_by_id(type, id), options)
+        doc_to_entity(type, @db.find_by_id(type, id), options)
+      end
+
+      def find(type, criteria, options={})
+        @db.find(type, criteria).map {|doc| doc_to_entity(type, doc, options)}
       end
 
       def save(entity, options={})
@@ -31,12 +39,12 @@ module Monger
           when Monger::Config::PropertyModes::Direct
             doc[name.to_s] = value
           when Monger::Config::PropertyModes::Reference
-            self.save(value) if value.monger_id.nil?
+            save(value) if value.monger_id.nil? || prop.update?
             doc["#{name}_id"] = value.monger_id
           when Monger::Config::PropertyModes::Collection
             value.each do |el|
-              if el.monger_id.nil?
-                self.save(el, :extra => {"#{prop.ref_name}_id" => entity.monger_id})
+              if el.monger_id.nil? || prop.update?
+                save(el, :extra => {"#{prop.ref_name}_id" => entity.monger_id})
               end
             end
           end  
@@ -51,7 +59,7 @@ module Monger
         return doc
       end
 
-      def to_entity(type, mongo_doc, options={})
+      def doc_to_entity(type, mongo_doc, options={})
         depth = options[:depth] || 1
         return nil if depth < 0
 
@@ -66,13 +74,13 @@ module Monger
             obj.set_property(name, mongo_doc[name.to_s])
           when Monger::Config::PropertyModes::Reference
             doc = @db.find_by_id(prop.type, mongo_doc["#{name}_id"])
-            obj.set_property(name, self.to_entity(prop.type, doc, :depth => depth-1))
+            obj.set_property(name, doc_to_entity(prop.type, doc, :depth => depth-1))
           when Monger::Config::PropertyModes::Collection
             coll = []
             
             docs = @db.find(prop.type, {"#{prop.ref_name}_id" => mongo_doc.monger_id})
             docs.each do |doc|
-              mapped = self.to_entity(prop.type, doc, :depth => depth-1) 
+              mapped = doc_to_entity(prop.type, doc, :depth => depth-1) 
               coll << mapped unless mapped.nil?
             end
             obj.set_property(name, coll)
