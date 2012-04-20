@@ -17,7 +17,7 @@ module Database
   @@db['user'].insert(user1)
   @@db['user'].insert(user2)
 
-  post = {'_id' => Database::blog_post_id.to_monger_id, 'title' => 'Blog Post', 'author_id' => user1.monger_id, 'body' => 'Here is a post'}
+  post = {'_id' => Database::blog_post_id.to_monger_id, 'title' => 'Blog Post', 'author_id' => user1.monger_id, 'body' => 'Here is a post', 'tags' => [{'name' => 'tag1'}, {'name' => 'tag2'}], 'related_links' => {'urls' => ['http://www.google.com']}}
   @@db['blog_post'].insert(post)
 
   comment1 = {'user_id' => user1.monger_id, 'message' => 'A comment', 'blog_post_id' => post.monger_id}

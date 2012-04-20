@@ -109,4 +109,30 @@ describe Monger::Mongo::Mapper do
     doc = find_in_db(:comment, post.comments[0].monger_id)
     doc['message'].should eq 'New!'
   end
+
+  it "reads inline properties" do
+    post = subject.find_by_id(:blog_post, Database::blog_post_id)
+    post.related_links.urls.should eq ['http://www.google.com']
+    post.tags.should have_exactly(2).items
+    post.tags.each do |t|
+      ['tag1','tag2'].should include(t.name)
+    end
+  end
+
+  it "writes inline properties" do
+    post = Domain::BlogPost.new do |p|
+      p.related_links = Domain::Related.new do |r|
+        r.urls = ['http://www.google.com']
+      end
+    end
+    post.add_tag('tag1')
+    post.add_tag('tag2')
+
+    subject.save(post, :atomic => true)
+    
+    doc = find_in_db(:blog_post, post.monger_id)
+    doc['related_links']['urls'].should eq ['http://www.google.com']
+    doc['tags'][0]['name'].should eq 'tag1'
+    doc['tags'][1]['name'].should eq 'tag2'
+  end
 end

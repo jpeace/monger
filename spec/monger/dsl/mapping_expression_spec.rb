@@ -27,6 +27,21 @@ describe Monger::Dsl::MappingExpression do
     property.mode.should eq Monger::Config::PropertyModes::Collection
     property.klass.should eq Domain::Comment
     property.ref_name.should eq :blog_post
-    property.update.should eq false
+    property.should_not be_update
+    property.should_not be_inline
+  end
+
+  it "supports reference options" do
+    subject.has_a :related_links, :type => :related, :inline => true
+    property = subject.map.properties[:related_links]
+    property.should be_inline
+  end
+
+  it "supports collection options" do
+    subject.has_many :tags, :type => :tag, :ref_name => :some_name, :update => true, :inline => true
+    property = subject.map.properties[:tags]
+    property.ref_name.should eq :some_name
+    property.should be_update
+    property.should be_inline
   end
 end

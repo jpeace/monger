@@ -20,16 +20,21 @@ module Monger
       end
 
       def save(entity, options={})
+        inline = options[:inline] || false
+
         type = entity.class.build_symbol
 
         doc = {}
-        if entity.monger_id.nil?
-          @db.insert(type, doc)
-          entity.monger_id = doc.monger_id
-        else
-          doc.monger_id = entity.monger_id
+
+        if !inline
+          if entity.monger_id.nil?
+            @db.insert(type, doc)
+            entity.monger_id = doc.monger_id
+          else
+            doc.monger_id = entity.monger_id
+          end
         end
-        
+
         map = @config.maps[type]
         map.properties.each do |name, prop|
           value = entity.get_property(name)
@@ -39,12 +44,21 @@ module Monger
           when Monger::Config::PropertyModes::Direct
             doc[name.to_s] = value
           when Monger::Config::PropertyModes::Reference
-            save(value) if value.monger_id.nil? || prop.update?
-            doc["#{name}_id"] = value.monger_id
+            if prop.inline?
+              doc[name.to_s] = save(value, :inline => true)
+            else
+              save(value) if value.monger_id.nil? || prop.update?
+              doc["#{name}_id"] = value.monger_id
+            end
           when Monger::Config::PropertyModes::Collection
             value.each do |el|
-              if el.monger_id.nil? || prop.update?
-                save(el, :extra => {"#{prop.ref_name}_id" => entity.monger_id})
+              if prop.inline?
+                doc[name.to_s] ||= []
+                doc[name.to_s] << save(el, :inline => true)
+              else
+                if el.monger_id.nil? || prop.update?
+                  save(el, :extra => {"#{prop.ref_name}_id" => entity.monger_id})
+                end
               end
             end
           end  
@@ -55,7 +69,7 @@ module Monger
           doc[k] = v
         end
 
-        @db.update(type, doc, :atomic => options[:atomic])
+        @db.update(type, doc, :atomic => options[:atomic]) unless inline
         return doc
       end
 
@@ -73,12 +87,21 @@ module Monger
           when Monger::Config::PropertyModes::Direct
             obj.set_property(name, mongo_doc[name.to_s])
           when Monger::Config::PropertyModes::Reference
-            doc = @db.find_by_id(prop.type, mongo_doc["#{name}_id"])
-            obj.set_property(name, doc_to_entity(prop.type, doc, :depth => depth-1))
+            if prop.inline?
+              doc = mongo_doc[name.to_s]
+            else
+              doc = @db.find_by_id(prop.type, mongo_doc["#{name}_id"])
+            end
+            obj.set_property(name, doc_to_entity(prop.type, doc, :depth => depth-1)) unless doc.nil?
           when Monger::Config::PropertyModes::Collection
             coll = []
             
-            docs = @db.find(prop.type, {"#{prop.ref_name}_id" => mongo_doc.monger_id})
+            if prop.inline?
+              docs = mongo_doc[name.to_s]
+            else
+              docs = @db.find(prop.type, {"#{prop.ref_name}_id" => mongo_doc.monger_id})
+            end
+
             docs.each do |doc|
               mapped = doc_to_entity(prop.type, doc, :depth => depth-1) 
               coll << mapped unless mapped.nil?
