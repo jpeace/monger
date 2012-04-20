@@ -41,16 +41,16 @@ module Monger
           next if value.nil?
 
           case prop.mode
-          when Monger::Config::PropertyModes::Direct
+          when :direct
             doc[name.to_s] = value
-          when Monger::Config::PropertyModes::Reference
+          when :reference
             if prop.inline?
               doc[name.to_s] = save(value, :inline => true)
             else
               save(value) if value.monger_id.nil? || prop.update?
               doc["#{name}_id"] = value.monger_id
             end
-          when Monger::Config::PropertyModes::Collection
+          when :collection
             value.each do |el|
               if prop.inline?
                 doc[name.to_s] ||= []
@@ -84,16 +84,16 @@ module Monger
 
         map.properties.each do |name, prop|
           case prop.mode
-          when Monger::Config::PropertyModes::Direct
+          when :direct
             obj.set_property(name, mongo_doc[name.to_s])
-          when Monger::Config::PropertyModes::Reference
+          when :reference
             if prop.inline?
               doc = mongo_doc[name.to_s]
             else
               doc = @db.find_by_id(prop.type, mongo_doc["#{name}_id"])
             end
             obj.set_property(name, doc_to_entity(prop.type, doc, :depth => depth-1)) unless doc.nil?
-          when Monger::Config::PropertyModes::Collection
+          when :collection
             coll = []
             
             if prop.inline?

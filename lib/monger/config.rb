@@ -5,14 +5,6 @@ require 'monger/dsl/configuration_expression'
 end
 
 module Monger
-  module Config
-    module PropertyModes
-      Direct = 0
-      Reference = 1
-      Collection = 2
-    end
-  end
-
   class Configuration
     attr_accessor :host, :port, :database, :ember_namespace, :modules
     attr_reader :maps

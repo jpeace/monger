@@ -16,7 +16,7 @@ describe Monger::Dsl::MappingExpression do
     subject.has_a :author, :type => :user
     property = subject.map.properties[:author]
     property.name.should eq :author
-    property.mode.should eq Monger::Config::PropertyModes::Reference
+    property.mode.should eq :reference
     property.klass.should eq Domain::Auth::User
   end
 
@@ -24,7 +24,7 @@ describe Monger::Dsl::MappingExpression do
     subject.has_many :comments, :type => :comment
     property = subject.map.properties[:comments]
     property.name.should eq :comments
-    property.mode.should eq Monger::Config::PropertyModes::Collection
+    property.mode.should eq :collection
     property.klass.should eq Domain::Comment
     property.ref_name.should eq :blog_post
     property.should_not be_update

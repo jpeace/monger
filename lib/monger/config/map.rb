@@ -7,7 +7,7 @@ module Monger
         @properties = {}
       end
 
-      def add_property(name, klass=nil, mode=Monger::Config::PropertyModes::Direct, options={})
+      def add_property(name, klass=nil, mode=:direct, options={})
         ref_name = options[:ref_name] || nil
         update = options[:update] || false
         inline = options[:inline] || false

@@ -20,14 +20,14 @@ module Monger
       def has_a(name, options={})
         raise ArgumentError if options[:type].nil?
         klass = @config.find_class(options[:type])
-        @map.add_property(name, klass, Monger::Config::PropertyModes::Reference, options)
+        @map.add_property(name, klass, :reference, options)
       end
 
       def has_many(name, options={})
         raise ArgumentError if options[:type].nil?
         klass = @config.find_class(options[:type])
         options[:ref_name] ||= @type
-        @map.add_property(name, klass, Monger::Config::PropertyModes::Collection, options)
+        @map.add_property(name, klass, :collection, options)
       end
     end
   end
