@@ -2,7 +2,7 @@ database 'monger-test'
 host 'localhost'
 port 27017
 
-ember_namespace 'Monger.Test'
+js_namespace 'Test'
 
 modules Domain, Domain::Auth
 
