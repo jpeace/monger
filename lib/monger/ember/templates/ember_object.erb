@@ -1,0 +1,9 @@
+<%= domain_namespace %>.<%= object_name %> = Ember.Object.extend({
+<%= initialization_list %>,
+
+  serialize:function(){
+    return JSON.stringify({
+<%= serialization_list %>
+    });
+  }
+});

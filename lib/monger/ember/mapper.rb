@@ -1,8 +1,24 @@
+require 'erb'
+
 module Monger
   module Ember
     class Mapper
       def initialize(config)
         @config = config
+        @template_path = "#{File.dirname(__FILE__)}/templates"
+      end
+
+      def build_object_def(type)
+        binding = CodeGenBinding.new(@config, type)
+        template = ERB.new(IO.read("#{@template_path}/ember_object.erb"))
+        template.result(binding.get_binding)
+      end
+
+      def domain
+        js = "#{@config.js_namespace}.Domain={};\n\n" +
+        @config.maps.sort_by{|name,map|name}.map do |name,map|
+          build_object_def(name)
+        end.join("\n\n")
       end
     end
   end
