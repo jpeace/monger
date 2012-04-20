@@ -6,6 +6,7 @@ describe Monger::Configuration do
       subject.database.should eq 'monger-test'
       subject.host.should eq 'localhost'
       subject.port.should eq 27017
+      subject.ember_namespace.should eq 'Monger.Test'
       [Domain, Domain::Auth].each {|mod| subject.modules.should include(mod)}
     end
 

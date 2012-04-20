@@ -14,7 +14,7 @@ module Monger
   end
 
   class Configuration
-    attr_accessor :host, :port, :database, :modules
+    attr_accessor :host, :port, :database, :ember_namespace, :modules
     attr_reader :maps
 
     def self.from_file(path)

@@ -1,6 +1,9 @@
 database 'monger-test'
 host 'localhost'
 port 27017
+
+ember_namespace 'Monger.Test'
+
 modules Domain, Domain::Auth
 
 map :tag do |t|

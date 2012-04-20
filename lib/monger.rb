@@ -2,6 +2,7 @@ require 'monger/patches'
 require 'monger/config'
 require 'monger/session'
 require 'monger/mongo'
+require 'monger/ember'
 require 'monger/version'
 
 module Monger

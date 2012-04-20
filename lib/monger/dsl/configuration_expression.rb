@@ -19,6 +19,10 @@ module Monger
         @config.port = port
       end
 
+      def ember_namespace(namespace)
+        @config.ember_namespace = namespace
+      end
+
       def modules(*modules)
         @config.modules = modules
       end
