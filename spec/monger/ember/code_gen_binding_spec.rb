@@ -4,6 +4,7 @@ describe Monger::Ember::CodeGenBinding do
   it "exposes javascript namespaces" do
     subject.domain_namespace.should eq 'Test.Domain'
     subject.mapper_namespace.should eq 'Test.Mappers'
+    subject.cache_namespace.should eq 'Test.Cache'
   end
 
   it "exposes the object name" do
@@ -19,7 +20,7 @@ describe Monger::Ember::CodeGenBinding do
 author:'',
 body:'',
 comments:[],
-related_links:'',
+relatedLinks:'',
 tags:[],
 title:''}
     subject.initialization_list.should eq initialization_list
@@ -30,7 +31,7 @@ title:''}
 author:this.author,
 body:this.body,
 comments:this.comments,
-related_links:this.related_links,
+relatedLinks:this.relatedLinks,
 tags:this.tags,
 title:this.title}
     subject.serialization_list.should eq serialization_list

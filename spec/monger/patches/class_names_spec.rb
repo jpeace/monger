@@ -31,6 +31,14 @@ describe "Symbol patches" do
   it "can build a class name from a long symbol" do
     :much_longer_symbol.build_class_name.should eq 'MuchLongerSymbol'
   end
+
+  it "can build a Javascript name from a short symbol" do
+    :short.build_javascript_name.should eq 'short'
+  end
+
+  it "can build a Javascript name from a long symbol" do
+    :much_longer_symbol.build_javascript_name.should eq 'muchLongerSymbol'
+  end
 end
 
 describe "String patches" do
@@ -40,5 +48,13 @@ describe "String patches" do
 
   it "can build a class name from a long string" do
     'much_longer_string'.build_class_name.should eq 'MuchLongerString'
+  end
+
+  it "can build a Javascript name from a short string" do
+    'short'.build_javascript_name.should eq 'short'
+  end
+
+  it "can build a Javascript name from a long string" do
+    'much_longer_string'.build_javascript_name.should eq 'muchLongerString'
   end
 end

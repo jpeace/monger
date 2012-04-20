@@ -5,7 +5,7 @@ id:'',
 author:'',
 body:'',
 comments:[],
-related_links:'',
+relatedLinks:'',
 tags:[],
 title:'',
 
@@ -15,7 +15,7 @@ id:this.id,
 author:this.author,
 body:this.body,
 comments:this.comments,
-related_links:this.related_links,
+relatedLinks:this.relatedLinks,
 tags:this.tags,
 title:this.title
     });

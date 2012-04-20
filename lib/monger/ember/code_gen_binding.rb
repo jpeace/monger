@@ -1,11 +1,13 @@
 module Monger
   module Ember
     class CodeGenBinding
-      def initialize(config, type)
+      def initialize(config, type=nil)
         @config = config
-        @type = type
-        @map = @config.maps[@type]
-        raise ArgumentError if @map.nil?
+        if !type.nil?
+          @type = type
+          @map = @config.maps[@type]
+          raise ArgumentError if @map.nil?
+        end
       end
 
       def get_binding
@@ -20,6 +22,10 @@ module Monger
         "#{@config.js_namespace}.Mappers"
       end
 
+      def cache_namespace
+        "#{@config.js_namespace}.Cache"
+      end
+
       def object_name
         @type.build_class_name
       end
@@ -31,14 +37,14 @@ module Monger
       def initialization_list
         "id:'',\n" +
         properties.map do |name, prop|
-          "#{name}:#{get_default_for_property(prop)}"
+          "#{name.build_javascript_name}:#{get_default_for_property(prop)}"
         end.join(",\n")
       end
 
       def serialization_list
         "id:this.id,\n" +
         properties.map do |name, prop|
-          "#{name}:this.#{name}"
+          "#{name.build_javascript_name}:this.#{name.build_javascript_name}"
         end.join(",\n")
       end
 

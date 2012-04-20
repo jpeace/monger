@@ -5,11 +5,15 @@ describe Monger::Ember::Mapper do
     IO.read("#{environment_root}/codegen/#{codegen}")
   end
   
-  it 'can build Ember object definitions' do
+  it "can build the cache module" do
+    subject.cache.should eq codegen('cache.js')
+  end
+
+  it "can build Ember object definitions" do
     subject.build_object_def(:blog_post).should eq codegen('ember_object.js')
   end
 
-   it 'can build the domain' do
+  it "can build the domain" do
     subject.domain.should eq codegen('domain.js')
   end
 end

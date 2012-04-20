@@ -20,6 +20,12 @@ module Monger
           build_object_def(name)
         end.join("\n\n")
       end
+
+      def cache
+        binding = CodeGenBinding.new(@config)
+        template = ERB.new(IO.read("#{@template_path}/cache.erb"))
+        template.result(binding.get_binding)
+      end
     end
   end
 end
