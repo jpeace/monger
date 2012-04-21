@@ -3,6 +3,7 @@ require 'monger/config'
 require 'monger/session'
 require 'monger/mongo'
 require 'monger/ember'
+require 'monger/json'
 require 'monger/version'
 
 module Monger
