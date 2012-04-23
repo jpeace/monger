@@ -1,4 +1,5 @@
 require 'json'
+include Database
 
 describe Monger::Json::Mapper do
   subject {described_class.new(Mocks.real_config)}
@@ -29,18 +30,16 @@ describe Monger::Json::Mapper do
 
   json = %{
     {
-      "id":1,
+      "id":"#{Database::blog_post_id}",
       "title":"Title",
       "body":"Body",
       "author":{
-        "id":2,
         "name":"Author",
         "age":30,
         "gender":"M"
       },
       "comments":[
         {
-          "id":3,
           "user":{
             "id":4,
             "name":"Commenter",
@@ -103,10 +102,10 @@ describe Monger::Json::Mapper do
     end
 
     it "works with monger ids" do
-      post.monger_id = 1
+      post.monger_id = Database::blog_post_id.to_monger_id
       hash = subject.get_hash(post)
 
-      hash['id'].should eq 1
+      hash['id'].should eq Database::blog_post_id
     end
   end
 
@@ -144,7 +143,8 @@ describe Monger::Json::Mapper do
 
     it "works with monger ids" do
       obj = subject.from_hash(:blog_post, hash)
-      obj.monger_id.should eq 1
+      obj.monger_id.should be_is_a BSON::ObjectId
+      obj.monger_id.to_s.should eq Database::blog_post_id
     end
   end
 
