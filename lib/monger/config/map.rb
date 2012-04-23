@@ -7,6 +7,10 @@ module Monger
         @properties = {}
       end
 
+      def direct_properties
+        @properties.select{|n,p| p.mode == :direct}
+      end
+
       def add_property(name, klass=nil, mode=:direct, options={})
         ref_name = options[:ref_name] || nil
         update = options[:update] || false
