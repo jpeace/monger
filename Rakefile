@@ -9,7 +9,7 @@ Echoe.new("monger", "0.0.1") do |p|
   p.email           = "peace.jarrod@gmail.com"  
   p.ignore_pattern  = FileList[".gitignore"]  
   p.development_dependencies = ["debugger"]
-  p.runtime_dependencies = ["mongo", "bson_ext"]
+  p.runtime_dependencies = ["mongo", "bson_ext", "json"]
 end  
   
 Dir["#{File.dirname(__FILE__)}/tasks/*.rake"].sort.each { |ext| load ext }
