@@ -7,8 +7,8 @@ require 'monger/version'
 
 module Monger
   class << self
-    def bootstrap(config_file='config/monger.rb')
-      Configuration.new("#{Dir.pwd}/#{config_file}")
+    def bootstrap(config_file)
+      Configuration.new(config_file)
     end
 
     def create_session(config)
