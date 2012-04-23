@@ -8,23 +8,27 @@ describe Monger::Mongo::Mapper do
     post.title.should eq 'Blog Post'
   end
 
-  it "works with mongo ids, too" do
+  it "works with monger ids, too" do
     post = subject.find_by_id(:blog_post, Database::blog_post_id.to_monger_id)
     post.title.should eq 'Blog Post'
   end
 
-  it "adds a mongo id" do
+  it "adds a monger id" do
     post = subject.find_by_id(:blog_post, Database::blog_post_id)
     post.monger_id.should eq Database::blog_post_id.to_monger_id
   end
 
-  it "maps direct properties" do
+  it "builds search criteria" do
+    subject.build_search_criteria(:blog_post, 'term').should eq ({'$or' => [{'title' => /term/i}, {'body' => /term/i}]})
+  end
+
+  it "reads direct properties" do
     post = subject.find_by_id(:blog_post, Database::blog_post_id)
     post.title.should eq 'Blog Post'
     post.body.should eq 'Here is a post'
   end
 
-  it "maps reference properties" do
+  it "reads reference properties" do
     post = subject.find_by_id(:blog_post, Database::blog_post_id)
     post.author.should be_is_a Domain::Auth::User
     post.author.name.should eq 'John Doe'
@@ -32,7 +36,7 @@ describe Monger::Mongo::Mapper do
     post.author.gender.should eq 'Male'
   end
 
-  it "maps collection properties" do
+  it "reads collection properties" do
     post = subject.find_by_id(:blog_post, Database::blog_post_id)
     post.comments.should have_exactly(2).items
     post.comments.each do |c|
@@ -40,7 +44,7 @@ describe Monger::Mongo::Mapper do
     end
   end
 
-  it "maps to a given depth" do
+  it "reads to a given depth" do
     post = subject.find_by_id(:blog_post, Database::blog_post_id, :depth => 2)
     post.author.posts.first.title.should eq 'Blog Post'
     post.author.posts.first.author.should be_nil

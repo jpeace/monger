@@ -23,6 +23,10 @@ module Monger
         @config.js_namespace = namespace
       end
 
+      def debug(debug)
+        @config.debug = debug
+      end
+
       def modules(*modules)
         @config.modules = modules
       end

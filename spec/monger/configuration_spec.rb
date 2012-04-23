@@ -7,6 +7,7 @@ describe Monger::Configuration do
       subject.host.should eq 'localhost'
       subject.port.should eq 27017
       subject.js_namespace.should eq 'Test'
+      subject.debug.should be_false
       [Domain, Domain::Auth].each {|mod| subject.modules.should include(mod)}
     end
 

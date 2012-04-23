@@ -4,19 +4,24 @@ module Monger
   module Mongo
     class Database
       def initialize(config)
-        @db = ::Mongo::Connection.new(config.host, config.port).db(config.database)
-      end
-
-      def find_all(type)
-        @db[type.to_s].find
-      end
-
-      def find_by_id(type, id)
-        @db[type.to_s].find({'_id' => id}).first
+        @config = config
+        @db = ::Mongo::Connection.new(@config.host, @config.port).db(@config.database)
       end
 
       def find(type, criteria={})
+        if @config.verbose?
+          puts type.inspect
+          puts criteria.inspect
+        end
         @db[type.to_s].find(criteria)
+      end
+
+      def find_all(type)
+        find(type)
+      end
+
+      def find_by_id(type, id)
+        find(type, {'_id' => id}).first
       end
 
       def insert(type, doc, options={})

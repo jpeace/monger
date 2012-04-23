@@ -19,6 +19,19 @@ module Monger
         @db.find(type, criteria).map {|doc| doc_to_entity(type, doc, options)}
       end
 
+      def search(type, term, options={})
+        find(type, build_search_criteria(type, term), options)
+      end
+
+      def build_search_criteria(type, term)
+        criteria = {'$or' => []}
+        map = @config.maps[type]
+        map.direct_properties.each do |name, prop|
+          criteria['$or'] << {name.to_s => /#{term}/i}
+        end
+        criteria
+      end
+
       def save(entity, options={})
         inline = options[:inline] || false
 
