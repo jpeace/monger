@@ -146,6 +146,12 @@ describe Monger::Json::Mapper do
       obj.monger_id.should be_is_a BSON::ObjectId
       obj.monger_id.to_s.should eq Database::blog_post_id
     end
+
+    it "handles empty ids" do
+      hash['id'] = ''
+      obj = subject.from_hash(:blog_post, hash)
+      obj.monger_id.should be_nil
+    end
   end
 
   it "maps entities to json" do

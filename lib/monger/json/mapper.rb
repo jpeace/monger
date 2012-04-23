@@ -59,7 +59,7 @@ module Monger
           end
         end
 
-        obj.monger_id = hash['id'].to_s.to_monger_id unless hash['id'].nil?
+        obj.monger_id = hash['id'].to_s.to_monger_id unless hash['id'].nil? || hash['id'] == ''
 
         obj
       end
