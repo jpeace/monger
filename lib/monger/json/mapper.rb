@@ -6,6 +6,10 @@ module Monger
       end
 
       def get_hash(obj)
+        if obj.is_a? Array
+          return obj.map {|i| get_hash(i)}
+        end
+
         type = obj.class.build_symbol
         map = @config.maps[type]
         raise ArgumentError if map.nil?
@@ -22,8 +26,7 @@ module Monger
             when :reference
               hash[name.to_s] = get_hash(val) unless val.nil?
             when :collection
-              hash[name.to_s] = []
-              val.each {|i| hash[name.to_s] << get_hash(i)}
+              hash[name.to_s] = val.map {|i| get_hash(i)}
             end
           end
         end
@@ -34,6 +37,10 @@ module Monger
       end
 
       def from_hash(type, hash)
+        if hash.is_a? Array
+          return hash.map {|i| from_hash(type, i)}
+        end
+
         map = @config.maps[type]
         raise ArgumentError if map.nil?
 
@@ -48,9 +55,7 @@ module Monger
           when :reference
             obj.set_property(name, from_hash(prop.type, val))
           when :collection
-            coll = []
-            val.each {|i| coll << from_hash(prop.type, i)}
-            obj.set_property(name, coll)
+            obj.set_property(name, val.map{|i| from_hash(prop.type, i)})
           end
         end
 

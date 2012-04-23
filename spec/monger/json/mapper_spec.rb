@@ -155,8 +155,29 @@ describe Monger::Json::Mapper do
     subject.entity_to_json(obj).should eq '{"name":"Tag"}'
   end
 
+  it "maps entity collections to json" do
+    coll = [
+      Domain::Tag.new do |t|
+        t.name = 'Tag1'
+      end,
+      Domain::Tag.new do |t|
+        t.name = 'Tag2'
+      end
+    ]
+    subject.entity_to_json(coll).should eq '[{"name":"Tag1"},{"name":"Tag2"}]'
+  end
+
   it "maps json to entities" do
     json = '{"name":"Tag"}'
     subject.json_to_entity(:tag, json).name.should eq 'Tag'
+  end
+
+  it "maps json collections to entities" do
+    json = '[{"name":"Tag1"},{"name":"Tag2"}]'
+    tags = subject.json_to_entity(:tag, json)
+    tags.should be_is_a Array
+    tags.should have_exactly(2).items
+    tags[0].name.should eq 'Tag1'
+    tags[1].name.should eq 'Tag2'
   end
 end
