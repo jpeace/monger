@@ -17,16 +17,17 @@ module Monger
         hash = {}
         map.properties.each do |name, prop|
           val = obj.get_property(name)
+          js_name = name.build_javascript_name
           if val.nil?
-            hash[name.to_s] = nil
+            hash[js_name] = nil
           else
             case prop.mode
             when :direct
-              hash[name.to_s] = val
+              hash[js_name] = val
             when :reference
-              hash[name.to_s] = get_hash(val) unless val.nil?
+              hash[js_name] = get_hash(val) unless val.nil?
             when :collection
-              hash[name.to_s] = val.map {|i| get_hash(i)}
+              hash[js_name] = val.map {|i| get_hash(i)}
             end
           end
         end
@@ -46,7 +47,7 @@ module Monger
 
         obj = @config.build_object_of_type(type)
         map.properties.each do |name, prop|
-          val = hash[name.to_s]
+          val = hash[name.build_javascript_name]
           next if val.nil?
 
           case prop.mode

@@ -53,7 +53,7 @@ describe Monger::Json::Mapper do
         {"name":"Tag1"},
         {"name":"Tag2"}
       ],
-      "related_links":{
+      "relatedLinks":{
         "urls":["http://www.google.com"]
       }
     }
@@ -88,8 +88,8 @@ describe Monger::Json::Mapper do
     it "works with inline references" do
       hash = subject.get_hash(post)
 
-      hash['related_links'].should be_is_a Hash
-      hash['related_links']['urls'].should eq ['http://www.google.com']
+      hash['relatedLinks'].should be_is_a Hash
+      hash['relatedLinks']['urls'].should eq ['http://www.google.com']
     end
 
     it "works with inline collections" do
@@ -139,6 +139,22 @@ describe Monger::Json::Mapper do
       obj.comments.should have_exactly(1).items
       obj.comments[0].should be_is_a Domain::Comment
       obj.comments[0].message.should eq 'Comment!'
+    end
+
+    it "works with inline references" do
+      obj = subject.from_hash(:blog_post, hash)
+
+      obj.related_links.should be_is_a Domain::Related
+      obj.related_links.urls.should eq ['http://www.google.com']
+    end
+
+    it "works with inline collections" do
+      obj = subject.from_hash(:blog_post, hash)
+
+      obj.tags.should be_is_a Array
+      obj.tags.should have_exactly(2).items
+      obj.tags[0].name.should eq 'Tag1'
+      obj.tags[1].name.should eq 'Tag2'
     end
 
     it "works with monger ids" do
