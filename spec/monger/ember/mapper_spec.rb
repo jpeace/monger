@@ -16,16 +16,4 @@ describe Monger::Ember::Mapper do
   it "can build the cache module" do
     subject.cache.should eq codegen('cache.js')
   end
-
-  it "can build the domain" do
-    subject.domain.should eq codegen('domain.js')
-  end
-
-  it "can build the mappers" do
-    subject.mappers.should eq codegen('mappers.js')
-  end
-
-  it "can put the whole thing together" do
-    subject.javascript.should eq codegen('monger_ember.js')
-  end
 end

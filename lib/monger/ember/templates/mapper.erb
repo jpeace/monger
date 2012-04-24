@@ -1,4 +1,7 @@
 <%= mapper_namespace %>.<%= javascript_name %> = function(obj) {
+  if (!obj) {
+    return null;
+  }
 <% properties.each do |name,prop| %><%= property_mapper_for name %>
 <% end %>
   <%= cache_module %>.set('<%= javascript_name %>', obj.id,

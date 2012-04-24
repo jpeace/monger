@@ -1,4 +1,7 @@
 Test.Mappers.blogPost = function(obj) {
+  if (!obj) {
+    return null;
+  }
 var author = Test.Mappers.user(obj.author);
 var body = obj.body;
 var comments = [];
