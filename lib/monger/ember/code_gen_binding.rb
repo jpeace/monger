@@ -45,10 +45,32 @@ module Monger
         end.join(",\n")
       end
 
+      def serialization_setup
+        properties.select{|n,p| p.mode != :direct}.map do |name, prop|
+          js_name = name.build_javascript_name
+          if (prop.mode == :reference)
+%{var #{js_name} = null;
+if (this.#{js_name}) {
+  #{js_name} = this.#{js_name}.serialize();
+}}
+          elsif (prop.mode == :collection)
+%{var #{js_name} = [];
+for (var i = 0 ; i < this.#{js_name}.length ; ++i) {
+  #{js_name}.push(this.#{js_name}[i].serialize());
+}}
+          end
+        end.join("\n")
+      end
+
       def serialization_list
         "id:this.id,\n" +
         properties.map do |name, prop|
-          "#{name.build_javascript_name}:this.#{name.build_javascript_name}"
+          case prop.mode
+          when :direct
+            "#{name.build_javascript_name}:this.#{name.build_javascript_name}"
+          when :reference, :collection
+            "#{name.build_javascript_name}:#{name.build_javascript_name}"
+          end
         end.join(",\n")
       end
 

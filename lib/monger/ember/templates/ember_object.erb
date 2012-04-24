@@ -2,8 +2,9 @@
 <%= initialization_list %>,
 
   serialize:function(){
-    return JSON.stringify({
+<%= serialization_setup %>
+    return {
 <%= serialization_list %>
-    });
+    };
   }
 });

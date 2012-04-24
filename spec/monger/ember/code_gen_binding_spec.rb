@@ -30,13 +30,33 @@ title:''}
     subject.initialization_list.should eq initialization_list
   end
 
+  it "exposes a serialization setup section" do
+    serialization_setup = %{var author = null;
+if (this.author) {
+  author = this.author.serialize();
+}
+var comments = [];
+for (var i = 0 ; i < this.comments.length ; ++i) {
+  comments.push(this.comments[i].serialize());
+}
+var relatedLinks = null;
+if (this.relatedLinks) {
+  relatedLinks = this.relatedLinks.serialize();
+}
+var tags = [];
+for (var i = 0 ; i < this.tags.length ; ++i) {
+  tags.push(this.tags[i].serialize());
+}}
+    subject.serialization_setup.should eq serialization_setup
+  end
+
   it "exposes a serialization list" do
     serialization_list = %{id:this.id,
-author:this.author,
+author:author,
 body:this.body,
-comments:this.comments,
-relatedLinks:this.relatedLinks,
-tags:this.tags,
+comments:comments,
+relatedLinks:relatedLinks,
+tags:tags,
 title:this.title}
     subject.serialization_list.should eq serialization_list
   end
