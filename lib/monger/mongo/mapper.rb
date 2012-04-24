@@ -20,15 +20,14 @@ module Monger
       end
 
       def search(type, term, options={})
-        find(type, build_search_criteria(type, term), options)
+        find(type, build_search_criteria(type, term, options[:fields]), options)
       end
 
-      def build_search_criteria(type, term)
-        criteria = {'$or' => []}
+      def build_search_criteria(type, term, fields=nil)
+        criteria = {}
         map = @config.maps[type]
-        map.direct_properties.each do |name, prop|
-          criteria['$or'] << {name.to_s => /#{term}/i}
-        end
+        fields = map.direct_properties.map{|name,prop| name} if fields.nil?
+        criteria['$or'] = fields.map {|name| {name.to_s => /#{term}/i}}
         criteria
       end
 

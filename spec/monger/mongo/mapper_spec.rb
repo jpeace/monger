@@ -22,6 +22,10 @@ describe Monger::Mongo::Mapper do
     subject.build_search_criteria(:blog_post, 'term').should eq ({'$or' => [{'title' => /term/i}, {'body' => /term/i}]})
   end
 
+  it "can build a search criteria for the specified fields" do
+    subject.build_search_criteria(:blog_post, 'term', [:title]).should eq ({'$or' => [{'title' => /term/i}]})
+  end
+
   it "reads direct properties" do
     post = subject.find_by_id(:blog_post, Database::blog_post_id)
     post.title.should eq 'Blog Post'
