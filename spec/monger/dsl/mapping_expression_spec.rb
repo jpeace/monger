@@ -12,6 +12,13 @@ describe Monger::Dsl::MappingExpression do
     subject.map.properties[:body].name.should eq :body
   end
 
+  it "accepts multiple property lists" do
+    subject.properties :title
+    subject.map.properties.should have_exactly(1).items
+    subject.properties :body
+    subject.map.properties.should have_exactly(2).items
+  end
+
   it "builds reference properties" do
     subject.has_a :author, :type => :user
     property = subject.map.properties[:author]
