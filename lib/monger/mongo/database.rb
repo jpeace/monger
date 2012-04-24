@@ -25,6 +25,11 @@ module Monger
         @db[type.to_s].update({'_id'=>doc.monger_id}, doc)
         @db.get_last_error if options[:atomic]
       end
+
+      def delete(type, criteria, options={})
+        @db[type.to_s].remove(criteria)
+        @db.get_last_error if options[:atomic]
+      end
     end
   end
 end

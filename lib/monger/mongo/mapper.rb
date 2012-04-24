@@ -23,8 +23,12 @@ module Monger
         find(type, build_search_criteria(type, term, options[:fields]), options)
       end
 
-      def delete(type, id)
-        #@db.delete(type, {'_id'})
+      def delete(type, id, options={})
+        id = id.to_monger_id if id.is_a? String
+        entity = find_by_id(type, id)
+        remove_references(entity)
+        remove_collections(type, id)
+        @db.delete(type, {'_id' => id}, options)
       end
 
       def save(entity, options={})
@@ -83,6 +87,27 @@ module Monger
 
       private
 
+      def remove_references(entity)
+        type = entity.class.build_symbol
+        map = @config.maps[type]
+        map.reference_properties.each do |name, prop|
+          if prop.delete?
+            val = entity.get_property(name)
+            delete(prop.type, val.monger_id) unless val.nil?
+          end
+        end
+      end
+
+      def remove_collections(type, id)
+        map = @config.maps[type]
+        map.collection_properties.each do |name, prop|
+          if prop.delete?
+            collection = find(prop.type, {"#{prop.ref_name}_id" => id})
+            collection.each {|i| delete(prop.type, i.monger_id)}
+          end
+        end
+      end
+
       def doc_to_entity(type, mongo_doc, options={})
         depth = options[:depth] || 1
         return nil if depth < 0
@@ -111,6 +136,7 @@ module Monger
             else
               docs = @db.find(prop.type, {"#{prop.ref_name}_id" => mongo_doc.monger_id})
             end
+            docs ||= []
 
             docs.each do |doc|
               mapped = doc_to_entity(prop.type, doc, :depth => depth-1) 

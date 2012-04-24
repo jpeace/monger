@@ -15,6 +15,10 @@ module Monger
         @properties.select{|n,p| p.mode != :direct}
       end
 
+      def reference_properties
+        @properties.select{|n,p| p.mode == :reference}
+      end
+
       def collection_properties
         @properties.select{|n,p| p.mode == :collection}
       end
@@ -23,6 +27,7 @@ module Monger
         ref_name = options[:ref_name] || nil
         update = options[:update] || false
         inline = options[:inline] || false
+        delete = options[:delete] || false
         @properties[name] = Property.new do |p|
           p.name = name
           p.mode = mode
@@ -30,6 +35,7 @@ module Monger
           p.ref_name = ref_name
           p.update = update
           p.inline = inline
+          p.delete = delete
         end
       end
     end
