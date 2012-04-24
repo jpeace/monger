@@ -16,14 +16,6 @@ module Monger
         @db[type.to_s].find(criteria)
       end
 
-      def find_all(type)
-        find(type)
-      end
-
-      def find_by_id(type, id)
-        find(type, {'_id' => id}).first
-      end
-
       def insert(type, doc, options={})
         @db[type.to_s].insert(doc)
         @db.get_last_error

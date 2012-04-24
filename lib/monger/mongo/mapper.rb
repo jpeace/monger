@@ -6,29 +6,25 @@ module Monger
         @db = Database.new(config)
       end
 
+      def find(type, criteria, options={})
+        @db.find(type, criteria).map {|doc| doc_to_entity(type, doc, options)}
+      end
+
       def find_all(type, options={})
-        @db.find_all(type).map {|doc| doc_to_entity(type, doc, options)}
+        find(type, {}, options)
       end
 
       def find_by_id(type, id, options={})
         id = id.to_monger_id if id.is_a? String
-        doc_to_entity(type, @db.find_by_id(type, id), options)
-      end
-
-      def find(type, criteria, options={})
-        @db.find(type, criteria).map {|doc| doc_to_entity(type, doc, options)}
+        find(type, {'_id' => id}, options).first
       end
 
       def search(type, term, options={})
         find(type, build_search_criteria(type, term, options[:fields]), options)
       end
 
-      def build_search_criteria(type, term, fields=nil)
-        criteria = {}
-        map = @config.maps[type]
-        fields = map.direct_properties.map{|name,prop| name} if fields.nil?
-        criteria['$or'] = fields.map {|name| {name.to_s => /#{term}/i}}
-        criteria
+      def delete(type, id)
+        #@db.delete(type, {'_id'})
       end
 
       def save(entity, options={})
@@ -85,6 +81,8 @@ module Monger
         return doc
       end
 
+      private
+
       def doc_to_entity(type, mongo_doc, options={})
         depth = options[:depth] || 1
         return nil if depth < 0
@@ -102,7 +100,7 @@ module Monger
             if prop.inline?
               doc = mongo_doc[name.to_s]
             else
-              doc = @db.find_by_id(prop.type, mongo_doc["#{name}_id"])
+              doc = @db.find(prop.type, {'_id' => mongo_doc["#{name}_id"]}).first
             end
             obj.set_property(name, doc_to_entity(prop.type, doc, :depth => depth-1)) unless doc.nil?
           when :collection
@@ -122,6 +120,16 @@ module Monger
           end
         end
         return obj
+      end
+
+      public
+
+      def build_search_criteria(type, term, fields=nil)
+        criteria = {}
+        map = @config.maps[type]
+        fields = map.direct_properties.map{|name,prop| name} if fields.nil?
+        criteria['$or'] = fields.map {|name| {name.to_s => /#{term}/i}}
+        criteria
       end
     end  
   end
