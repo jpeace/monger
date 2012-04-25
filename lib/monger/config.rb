@@ -7,7 +7,7 @@ end
 module Monger
   class Configuration
     attr_accessor :host, :port, :database, :js_namespace, :modules, :debug
-    attr_reader :maps
+    attr_reader :mongo_hooks, :maps
 
     def self.from_file(path)
       File.open(path, 'r') do |file|
@@ -15,7 +15,11 @@ module Monger
       end
     end
 
-    def initialize(script)
+    def initialize(script='')
+      @mongo_hooks = {
+        :before_read => [],
+        :before_write => []
+      }
       @maps = {}
       dsl = Dsl::ConfigurationExpression.new(self)
       dsl.instance_eval(script)    
@@ -23,6 +27,11 @@ module Monger
 
     def verbose?
       @debug
+    end
+
+    def hook_mongo(hook, &block)
+      raise ArgumentError unless @mongo_hooks.keys.include? hook
+      @mongo_hooks[hook] << block
     end
 
     def find_class(type)

@@ -14,6 +14,16 @@ describe Monger::Configuration do
     it "can build objects from class names" do
       obj = subject.build_object_of_type(:blog_post)
       obj.should be_is_a(Domain::BlogPost)
-    end
+    end  
   end  
+
+  it "provides hooks for mongo events" do
+    subject.hook_mongo :before_read do |type, criteria|
+    end
+    subject.hook_mongo :before_write do |type, doc|
+    end
+
+    subject.mongo_hooks[:before_read].should have_exactly(1).items
+    subject.mongo_hooks[:before_write].should have_exactly(1).items
+  end
 end

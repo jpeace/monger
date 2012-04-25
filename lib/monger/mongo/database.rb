@@ -13,15 +13,18 @@ module Monger
           puts type.inspect
           puts criteria.inspect
         end
+        @config.mongo_hooks[:before_read].each {|proc| proc.call(type, criteria)}
         @db[type.to_s].find(criteria)
       end
 
       def insert(type, doc, options={})
+        @config.mongo_hooks[:before_write].each {|proc| proc.call(type, doc)}
         @db[type.to_s].insert(doc)
         @db.get_last_error
       end
 
       def update(type, doc, options={})
+        @config.mongo_hooks[:before_write].each {|proc| proc.call(type, doc)}
         @db[type.to_s].update({'_id'=>doc.monger_id}, doc)
         @db.get_last_error if options[:atomic]
       end
