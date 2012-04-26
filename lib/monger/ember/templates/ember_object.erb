@@ -1,6 +1,7 @@
 <%= domain_namespace %>.<%= object_name %> = Ember.Object.extend({
 <%= initialization_list %>,
 
+  isNew:function() { !this.id; }
   serialize:function(){
 <%= serialization_setup %>
     return {

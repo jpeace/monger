@@ -7,6 +7,7 @@ relatedLinks:'',
 tags:[],
 title:'',
 
+  isNew:function() { !this.id; }
   serialize:function(){
 var author = null;
 if (this.author) {
