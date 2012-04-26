@@ -7,7 +7,7 @@ relatedLinks:'',
 tags:[],
 title:'',
 
-  isNew:function() { !this.id; }.property('id'),
+  isNew:function() { return !this.id; }.property('id'),
   serialize:function(){
 var author = null;
 if (this.author) {
