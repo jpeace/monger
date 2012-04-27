@@ -10,6 +10,11 @@ map :tag do |t|
   t.properties :name
 end
 
+map :extended_tag do |t|
+  t.collection :tag
+  t.properties :name, :metadata
+end
+
 map :related do |r|
   r.properties :urls
 end

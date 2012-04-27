@@ -11,6 +11,10 @@ module Monger
         @map = Monger::Config::Map.new
       end
 
+      def collection(collection)
+        @map.set_collection(collection)
+      end
+
       def properties(*names)
         names.each do |name|
           @map.add_property(name)

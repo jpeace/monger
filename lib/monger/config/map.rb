@@ -1,7 +1,7 @@
 module Monger
   module Config
     class Map
-      attr_reader :properties
+      attr_reader :collection, :properties
       
       def initialize
         @properties = {}
@@ -21,6 +21,10 @@ module Monger
 
       def collection_properties
         @properties.select{|n,p| p.mode == :collection}
+      end
+
+      def set_collection(collection)
+        @collection = collection
       end
 
       def add_property(name, klass=nil, mode=:direct, options={})

@@ -55,4 +55,9 @@ describe Monger::Dsl::MappingExpression do
     property.should be_inline
     property.should be_delete
   end
+
+  it "supports custom collection names" do
+    subject.collection :custom
+    subject.map.collection.should eq :custom
+  end
 end

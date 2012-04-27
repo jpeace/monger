@@ -6,6 +6,13 @@ module Domain
     end
   end
 
+  class ExtendedTag < Tag
+    attr_accessor :metadata
+    def initialize
+      yield self if block_given?
+    end
+  end
+
   class Related
     attr_accessor :urls
     def initialize
