@@ -118,6 +118,7 @@ module Monger
         map = @config.maps[type]
 
         map.properties.each do |name, prop|
+          new_depth = prop.inline? ? depth : depth - 1
           case prop.mode
           when :direct
             obj.set_property(name, mongo_doc[name.to_s])
@@ -127,7 +128,7 @@ module Monger
             else
               doc = @db.find(prop.type, {'_id' => mongo_doc["#{name}_id"]}).first
             end
-            obj.set_property(name, doc_to_entity(prop.type, doc, :depth => depth-1)) unless doc.nil?
+            obj.set_property(name, doc_to_entity(prop.type, doc, :depth => new_depth)) unless doc.nil?
           when :collection
             coll = []
             
@@ -139,7 +140,7 @@ module Monger
             docs ||= []
 
             docs.each do |doc|
-              mapped = doc_to_entity(prop.type, doc, :depth => depth-1) 
+              mapped = doc_to_entity(prop.type, doc, :depth => new_depth) 
               coll << mapped unless mapped.nil?
             end
             obj.set_property(name, coll)

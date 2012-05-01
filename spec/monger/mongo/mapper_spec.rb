@@ -65,6 +65,13 @@ describe Monger::Mongo::Mapper do
         ['tag1','tag2'].should include(t.name)
       end
     end
+
+    it "ignores depth for inline properties" do
+      post = subject.find_by_id(:blog_post, Database::blog_post_id, :depth => 0)
+      post.author.should be_nil
+      post.related_links.urls.should eq ['http://www.google.com']
+      post.tags.should have_exactly(2).items
+    end
   end
 
   context "when writing" do
