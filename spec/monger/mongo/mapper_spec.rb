@@ -74,9 +74,10 @@ describe Monger::Mongo::Mapper do
     end
 
     it "can be configured to ignore certain mappings" do
-      post = subject.find_by_id(:blog_post, Database::blog_post_id, :ignore => [:tags, :author])
+      post = subject.find_by_id(:blog_post, Database::blog_post_id, :ignore => [:tags, :author, :urls])
       post.author.should be_nil
       post.tags.should be_empty
+      post.related_links.urls.should be_empty
     end
   end
 

@@ -132,7 +132,7 @@ module Monger
             else
               doc = @db.find(prop.type, {'_id' => mongo_doc["#{name}_id"]}).first
             end
-            obj.set_property(name, doc_to_entity(prop.type, doc, :depth => new_depth)) unless doc.nil?
+            obj.set_property(name, doc_to_entity(prop.type, doc, :depth => new_depth, :ignore => ignore)) unless doc.nil?
           when :collection
             coll = []
             
@@ -144,7 +144,7 @@ module Monger
             docs ||= []
 
             docs.each do |doc|
-              mapped = doc_to_entity(prop.type, doc, :depth => new_depth) 
+              mapped = doc_to_entity(prop.type, doc, :depth => new_depth, :ignore => ignore) 
               coll << mapped unless mapped.nil?
             end
             obj.set_property(name, coll)

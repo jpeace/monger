@@ -9,6 +9,7 @@ module Domain
   class Related
     attr_accessor :urls
     def initialize
+      @urls = []
       yield self if block_given?
     end
   end
