@@ -110,6 +110,8 @@ module Monger
 
       def doc_to_entity(type, mongo_doc, options={})
         depth = options[:depth] || 1
+        ignore = options[:ignore] || []
+
         return nil if depth < 0
 
         obj = @config.build_object_of_type(type)
@@ -118,6 +120,8 @@ module Monger
         map = @config.maps[type]
 
         map.properties.each do |name, prop|
+          next if ignore.include? name
+          
           new_depth = prop.inline? ? depth : depth - 1
           case prop.mode
           when :direct
