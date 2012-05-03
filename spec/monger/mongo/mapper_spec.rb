@@ -111,6 +111,26 @@ describe Monger::Mongo::Mapper do
       doc['message'].should eq 'Comment!'
     end
 
+    it "correctly add references to existing entities when inserting a new entity" do
+      user = Domain::Auth::User.new
+      subject.save(user, :atomic => true)
+
+      comment = Domain::Comment.new
+      subject.save(comment, :atomic => true)
+
+      post = Domain::BlogPost.new do |p|
+        p.author = user
+        p.comments = [comment]
+      end
+      subject.save(post, :atomic => true)
+
+      doc = find_in_db(:blog_post, post.monger_id)
+      doc['author_id'].should eq user.monger_id
+
+      doc = find_in_db(:comment, comment.monger_id)
+      doc['blog_post_id'].should eq post.monger_id
+    end
+
     it "updates direct properties" do
       post = Domain::BlogPost.new do |p|
         p.title = 'New Post'
