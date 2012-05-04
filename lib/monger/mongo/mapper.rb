@@ -7,7 +7,7 @@ module Monger
       end
 
       def find(type, criteria, options={})
-        @db.find(type, criteria).map {|doc| doc_to_entity(type, doc, options)}
+        @db.find(type, criteria, options).map {|doc| doc_to_entity(type, doc, options)}
       end
 
       def find_all(type, options={})
@@ -40,7 +40,7 @@ module Monger
 
         if !inline
           if entity.monger_id.nil?
-            @db.insert(type, doc)
+            @db.insert(type, doc, options)
             entity.monger_id = doc.monger_id
           else
             doc.monger_id = entity.monger_id
@@ -81,7 +81,7 @@ module Monger
           doc[k] = v
         end
 
-        @db.update(type, doc, :atomic => options[:atomic]) unless inline
+        @db.update(type, doc, options) unless inline
         return doc
       end
 
@@ -130,7 +130,7 @@ module Monger
             if prop.inline?
               doc = mongo_doc[name.to_s]
             else
-              doc = @db.find(prop.type, {'_id' => mongo_doc["#{name}_id"]}).first
+              doc = @db.find(prop.type, {'_id' => mongo_doc["#{name}_id"]}, options).first
             end
             obj.set_property(name, doc_to_entity(prop.type, doc, :depth => new_depth, :ignore => ignore)) unless doc.nil?
           when :collection
@@ -139,7 +139,7 @@ module Monger
             if prop.inline?
               docs = mongo_doc[name.to_s]
             else
-              docs = @db.find(prop.type, {"#{prop.ref_name}_id" => mongo_doc.monger_id})
+              docs = @db.find(prop.type, {"#{prop.ref_name}_id" => mongo_doc.monger_id}, options)
             end
             docs ||= []
 

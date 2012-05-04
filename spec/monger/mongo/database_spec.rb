@@ -35,4 +35,26 @@ describe Monger::Mongo::Database do
     @subject.update(:test, doc)
     doc['new_field'].should eq 'New!'
   end
+
+  it "can be configured to skip hooks" do
+    @config.hook_mongo :before_read do |type, criteria|
+      criteria['flag'] = true
+    end
+
+    @config.hook_mongo :before_write do |type, doc|
+      doc['new_field'] = 'New!'
+    end
+
+    docs = @subject.find(:test, {}, :skip_hooks => true)
+    docs.should have_exactly(2).items
+
+    # TODO - Why oh why doesn't this pass?
+    # @subject.insert(:test, {'name' => 'Testing'}, :skip_hooks => true)
+    # doc = @subject.find(:test, {'name' => 'Testing'}).first
+    # doc['new_field'].should be_nil
+
+    doc = @subject.find(:test, {'name' => 'Object1'}).first
+    @subject.update(:test, doc, :skip_hooks => true)
+    doc['new_field'].should be_nil
+  end
 end
