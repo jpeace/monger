@@ -67,6 +67,9 @@ module Monger
               if prop.inline?
                 doc[name.to_s] ||= []
                 doc[name.to_s] << save(el, :inline => true)
+              elsif prop.inverse?
+                doc[name.to_s] ||= []
+                doc[name.to_s] << el.monger_id if el.respond_to? :monger_id
               else
                 if el.monger_id.nil? || prop.update?
                   save(el, :extra => {"#{prop.ref_name}_id" => entity.monger_id})
@@ -138,6 +141,9 @@ module Monger
             
             if prop.inline?
               docs = mongo_doc[name.to_s]
+            elsif prop.inverse?
+              ids = mongo_doc[name.to_s]
+              docs = @db.find(prop.type, {'_id' => {'$in' => ids}}, options) unless ids.nil?
             else
               docs = @db.find(prop.type, {"#{prop.ref_name}_id" => mongo_doc.monger_id}, options)
             end

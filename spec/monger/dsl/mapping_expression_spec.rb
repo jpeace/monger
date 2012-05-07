@@ -38,6 +38,7 @@ describe Monger::Dsl::MappingExpression do
     property.should_not be_update
     property.should_not be_inline
     property.should_not be_delete
+    property.should_not be_inverse
   end
 
   it "supports reference options" do
@@ -48,11 +49,12 @@ describe Monger::Dsl::MappingExpression do
   end
 
   it "supports collection options" do
-    subject.has_many :tags, :type => :tag, :ref_name => :some_name, :update => true, :inline => true, :delete => true
+    subject.has_many :tags, :type => :tag, :ref_name => :some_name, :update => true, :inline => true, :delete => true, :inverse => true
     property = subject.map.properties[:tags]
     property.ref_name.should eq :some_name
     property.should be_update
     property.should be_inline
     property.should be_delete
+    property.should be_inverse
   end
 end

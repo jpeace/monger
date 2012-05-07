@@ -28,6 +28,7 @@ module Monger
         update = options[:update] || false
         inline = options[:inline] || false
         delete = options[:delete] || false
+        inverse = options[:inverse] || false
         @properties[name] = Property.new do |p|
           p.name = name
           p.mode = mode
@@ -36,6 +37,7 @@ module Monger
           p.update = update
           p.inline = inline
           p.delete = delete
+          p.inverse = inverse
         end
       end
     end

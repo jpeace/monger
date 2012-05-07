@@ -2,7 +2,7 @@ module Monger
   module Config
     class Property
       attr_accessor :name, :mode, :klass
-      attr_accessor :ref_name, :update, :inline, :delete
+      attr_accessor :ref_name, :update, :inline, :delete, :inverse
 
       def initialize
         yield self if block_given?
@@ -18,6 +18,10 @@ module Monger
 
       def delete?
         @delete
+      end
+
+      def inverse?
+        @inverse
       end
 
       def type

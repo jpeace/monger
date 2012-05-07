@@ -51,6 +51,11 @@ describe Monger::Mongo::Mapper do
       end
     end
 
+    it "reads inverse collection properties" do
+      user = subject.find(:user, {:name => 'Jane Smith'}).first
+      user.likes.should have_exactly(2).items
+    end
+
     it "reads to a given depth" do
       post = subject.find_by_id(:blog_post, Database::blog_post_id, :depth => 2)
       post.author.posts.first.title.should eq 'Blog Post'
@@ -181,6 +186,28 @@ describe Monger::Mongo::Mapper do
       doc['related_links']['urls'].should eq ['http://www.google.com']
       doc['tags'][0]['name'].should eq 'tag1'
       doc['tags'][1]['name'].should eq 'tag2'
+    end
+
+    it "writes inverse collections" do
+      post1 = Domain::BlogPost.new do |p|
+        p.title = 'Post1'
+      end
+      post2 = Domain::BlogPost.new do |p|
+        p.title = 'Post2'
+      end
+      subject.save(post1, :atomic => true)
+      subject.save(post2, :atomic => true)
+
+      user = Domain::Auth::User.new do |u|
+        u.name = 'Test'
+        u.likes = [post1, post2]
+      end
+      subject.save(user, :atomic => true)
+
+      doc = find_in_db(:user, user.monger_id)
+      post_ids = doc['likes']
+      post_ids.should be_include(post1.monger_id)
+      post_ids.should be_include(post2.monger_id)
     end
   end
 

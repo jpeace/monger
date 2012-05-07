@@ -25,6 +25,7 @@ end
 map :user do |u|
   u.properties :name, :age, :gender
   u.has_many :posts, :type => :blog_post, :ref_name => :author
+  u.has_many :likes, :type => :blog_post, :inverse => true
 end
 
 map :comment do |c|
