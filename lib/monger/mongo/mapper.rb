@@ -143,7 +143,14 @@ module Monger
               docs = mongo_doc[name.to_s]
             elsif prop.inverse?
               ids = mongo_doc[name.to_s]
-              docs = @db.find(prop.type, {'_id' => {'$in' => ids}}, options) unless ids.nil?
+              unless ids.nil?
+                # Preserve order of collection
+                docs = []
+                tmp_docs = @db.find(prop.type, {'_id' => {'$in' => ids}}, options).to_a
+                ids.each do |id|
+                  docs << tmp_docs.select {|doc| doc['_id'] == id}.first
+                end
+              end
             else
               docs = @db.find(prop.type, {"#{prop.ref_name}_id" => mongo_doc.monger_id}, options)
             end

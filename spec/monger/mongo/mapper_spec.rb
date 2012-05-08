@@ -209,6 +209,37 @@ describe Monger::Mongo::Mapper do
       post_ids.should be_include(post1.monger_id)
       post_ids.should be_include(post2.monger_id)
     end
+
+    it "preserves the order of inverse collections" do
+      post1 = Domain::BlogPost.new do |p|
+        p.title = 'Post1'
+      end
+      post2 = Domain::BlogPost.new do |p|
+        p.title = 'Post2'
+      end
+      post3 = Domain::BlogPost.new do |p|
+        p.title = 'Post3'
+      end
+      post4 = Domain::BlogPost.new do |p|
+        p.title = 'Post4'
+      end
+      subject.save(post1, :atomic => true)
+      subject.save(post2, :atomic => true)
+      subject.save(post3, :atomic => true)
+      subject.save(post4, :atomic => true)
+
+      user = Domain::Auth::User.new do |u|
+        u.name = 'Test'
+        u.likes = [post2, post1, post4, post3]
+      end
+      subject.save(user, :atomic => true)
+
+      user = subject.find_by_id(:user, user.monger_id)
+      user.likes[0].title.should eq 'Post2'
+      user.likes[1].title.should eq 'Post1'
+      user.likes[2].title.should eq 'Post4'
+      user.likes[3].title.should eq 'Post3'
+    end
   end
 
   context "when deleting" do
