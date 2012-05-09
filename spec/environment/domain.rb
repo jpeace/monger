@@ -15,7 +15,7 @@ module Domain
   end
 
   class BlogPost
-    attr_accessor :title, :author, :body, :comments, :tags, :related_links
+    attr_accessor :title, :author, :date, :body, :comments, :tags, :related_links
     def initialize
       @tags = []
       yield self if block_given?

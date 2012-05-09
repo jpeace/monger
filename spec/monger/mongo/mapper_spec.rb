@@ -35,6 +35,11 @@ describe Monger::Mongo::Mapper do
       post.body.should eq 'Here is a post'
     end
 
+    it "reads date properties" do
+      post = subject.find_by_id(:blog_post, Database::blog_post_id)
+      post.date.should eq Time.utc(2012, 5, 16)
+    end
+
     it "reads reference properties" do
       post = subject.find_by_id(:blog_post, Database::blog_post_id)
       post.author.should be_is_a Domain::Auth::User
@@ -114,6 +119,15 @@ describe Monger::Mongo::Mapper do
       comment.monger_id.should_not be_nil
       doc = find_in_db(:comment, comment.monger_id)
       doc['message'].should eq 'Comment!'
+    end
+
+    it "writes date properties" do
+      post = Domain::BlogPost.new do |p|
+        p.date = Time.utc(2012, 5, 16)
+      end
+      subject.save(post, :atomic => true)
+      doc = find_in_db(:blog_post, post.monger_id)
+      doc['date'].should eq Time.utc(2012, 5, 16)
     end
 
     it "correctly add references to existing entities when inserting a new entity" do

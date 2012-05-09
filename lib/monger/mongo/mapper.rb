@@ -53,7 +53,7 @@ module Monger
           next if value.nil?
 
           case prop.mode
-          when :direct
+          when :direct, :date
             doc[name.to_s] = value
           when :reference
             if prop.inline?
@@ -127,7 +127,7 @@ module Monger
           
           new_depth = prop.inline? ? depth : depth - 1
           case prop.mode
-          when :direct
+          when :direct, :date
             obj.set_property(name, mongo_doc[name.to_s])
           when :reference
             if prop.inline?

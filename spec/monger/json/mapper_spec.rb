@@ -7,6 +7,7 @@ describe Monger::Json::Mapper do
   post = Domain::BlogPost.new do |p|
     p.title = 'Title'
     p.body = 'Body'
+    p.date = Time.utc(2012, 5, 16)
     p.author = Domain::Auth::User.new do |u|
       u.name = 'Author'
       u.age = 30
@@ -33,6 +34,7 @@ describe Monger::Json::Mapper do
       "id":"#{Database::blog_post_id}",
       "title":"Title",
       "body":"Body",
+      "date":"5/16/2012",
       "author":{
         "name":"Author",
         "age":30,
@@ -66,6 +68,11 @@ describe Monger::Json::Mapper do
 
       hash['title'].should eq 'Title'
       hash['body'].should eq 'Body'
+    end
+
+    it "works with date properties" do
+      hash = subject.get_hash(post)
+      hash['date'].should eq '5/16/2012'
     end
 
     it "works with reference properties" do
@@ -121,6 +128,11 @@ describe Monger::Json::Mapper do
 
       obj.title.should eq 'Title'
       obj.body.should eq 'Body'
+    end
+
+    it "works with date properties" do
+      obj = subject.from_hash(:blog_post, hash)
+      obj.date.should eq Time.utc(2012, 5, 16)
     end
 
     it "works with reference properties" do

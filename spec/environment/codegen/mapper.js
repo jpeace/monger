@@ -8,6 +8,7 @@ var comments = [];
 for (var i = 0 ; i < obj.comments.length ; ++i) {
   comments.push(Test.Mappers.comment(obj.comments[i]));
 }
+var date = obj.date;
 var relatedLinks = obj.relatedLinks;
 var tags = obj.tags;
 var title = obj.title;
@@ -18,6 +19,7 @@ id:obj.id,
 author:author,
 body:body,
 comments:comments,
+date:date,
 relatedLinks:relatedLinks,
 tags:tags,
 title:title

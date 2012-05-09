@@ -19,6 +19,13 @@ describe Monger::Dsl::MappingExpression do
     subject.map.properties.should have_exactly(2).items
   end
 
+  it "builds date properties" do
+    subject.date :date
+    property = subject.map.properties[:date]
+    property.name.should eq :date
+    property.mode.should eq :date
+  end
+
   it "builds reference properties" do
     subject.has_a :author, :type => :user
     property = subject.map.properties[:author]

@@ -24,6 +24,8 @@ module Monger
             case prop.mode
             when :direct
               hash[js_name] = val
+            when :date
+              hash[js_name] = val.strftime('%-m/%-d/%Y')
             when :reference
               hash[js_name] = get_hash(val) unless val.nil?
             when :collection
@@ -53,6 +55,11 @@ module Monger
           case prop.mode
           when :direct
             obj.set_property(name, val)
+          when :date
+            pieces = val.split('/')
+            if pieces.length == 3
+              obj.set_property(name, Time.utc(pieces[2], pieces[0], pieces[1]))
+            end
           when :reference
             obj.set_property(name, from_hash(prop.type, val))
           when :collection

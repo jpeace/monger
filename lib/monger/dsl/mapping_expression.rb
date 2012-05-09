@@ -17,6 +17,10 @@ module Monger
         end
       end
 
+      def date(name)
+        @map.add_property(name, nil, :date)
+      end
+
       def has_a(name, options={})
         raise ArgumentError if options[:type].nil?
         klass = @config.find_class(options[:type])

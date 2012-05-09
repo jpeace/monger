@@ -16,7 +16,7 @@ describe Monger::Ember::CodeGenBinding do
   end
 
   it "exposes an alphabetized property list" do
-    subject.properties.map{|k,v|k}.should eq [:author,:body,:comments,:related_links,:tags,:title]
+    subject.properties.map{|k,v|k}.should eq [:author,:body,:comments,:date,:related_links,:tags,:title]
   end
 
   it "exposes an initialization list" do
@@ -24,6 +24,7 @@ describe Monger::Ember::CodeGenBinding do
 author:'',
 body:'',
 comments:[],
+date:'',
 relatedLinks:'',
 tags:[],
 title:''}
@@ -55,6 +56,7 @@ for (var i = 0 ; i < this.tags.length ; ++i) {
 author:author,
 body:this.body,
 comments:comments,
+date:this.date,
 relatedLinks:relatedLinks,
 tags:tags,
 title:this.title}
@@ -66,6 +68,7 @@ title:this.title}
 author:author,
 body:body,
 comments:comments,
+date:date,
 relatedLinks:relatedLinks,
 tags:tags,
 title:title}
