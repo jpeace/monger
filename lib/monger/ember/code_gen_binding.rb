@@ -116,8 +116,10 @@ for (var i = 0 ; i < this.#{js_name}.length ; ++i) {
       def collection_mapper(name, type)
         js_name = name.build_javascript_name
         %{var #{js_name} = [];
-for (var i = 0 ; i < obj.#{js_name}.length ; ++i) {
-  #{js_name}.push(#{mapper_namespace}.#{type.build_javascript_name}(obj.#{js_name}[i]));
+if (obj.#{js_name}) {
+  for (var i = 0 ; i < obj.#{js_name}.length ; ++i) {
+    #{js_name}.push(#{mapper_namespace}.#{type.build_javascript_name}(obj.#{js_name}[i]));
+  }
 }}
       end
 

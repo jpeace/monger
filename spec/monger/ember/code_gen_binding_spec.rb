@@ -86,8 +86,10 @@ title:title}
 
     it "works with collection properties" do
       comment_mapper = %{var comments = [];
-for (var i = 0 ; i < obj.comments.length ; ++i) {
-  comments.push(Test.Mappers.comment(obj.comments[i]));
+if (obj.comments) {
+  for (var i = 0 ; i < obj.comments.length ; ++i) {
+    comments.push(Test.Mappers.comment(obj.comments[i]));
+  }
 }}
       subject.property_mapper_for(:comments).should eq comment_mapper
     end

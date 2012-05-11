@@ -5,8 +5,10 @@ Test.Mappers.blogPost = function(obj) {
 var author = Test.Mappers.user(obj.author);
 var body = obj.body;
 var comments = [];
-for (var i = 0 ; i < obj.comments.length ; ++i) {
-  comments.push(Test.Mappers.comment(obj.comments[i]));
+if (obj.comments) {
+  for (var i = 0 ; i < obj.comments.length ; ++i) {
+    comments.push(Test.Mappers.comment(obj.comments[i]));
+  }
 }
 var date = obj.date;
 var relatedLinks = obj.relatedLinks;
