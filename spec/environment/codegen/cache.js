@@ -20,6 +20,10 @@ Test.Cache = new (function() {
     return this.dict[entity][id];
   };
 
+  this.getAll = function(entity) {
+    return this.dict[entity];
+  }
+
   this.set = function(entity, id, obj) {
     this.ensure(entity);
     if (!this.dict[entity][id]) {

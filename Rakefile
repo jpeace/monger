@@ -8,7 +8,7 @@ Echoe.new("monger", "0.0.1") do |p|
   p.author          = "Jarrod Peace"  
   p.email           = "peace.jarrod@gmail.com"  
   p.ignore_pattern  = FileList[".gitignore"]  
-  p.development_dependencies = ["debugger"]
+  p.development_dependencies = []#"debugger"]
   p.runtime_dependencies = ["mongo", "bson_ext", "json"]
 end  
   
