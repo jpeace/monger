@@ -40,6 +40,11 @@ describe Monger::Mongo::Mapper do
       post.date.should eq Time.utc(2012, 5, 16)
     end
 
+    it "reads time properties" do
+      post = subject.find_by_id(:blog_post, Database::blog_post_id)
+      post.time.to_12_hour.should eq '9:30 PM'
+    end
+
     it "reads reference properties" do
       post = subject.find_by_id(:blog_post, Database::blog_post_id)
       post.author.should be_is_a Domain::Auth::User
@@ -128,6 +133,17 @@ describe Monger::Mongo::Mapper do
       subject.save(post, :atomic => true)
       doc = find_in_db(:blog_post, post.monger_id)
       doc['date'].should eq Time.utc(2012, 5, 16)
+    end
+
+    it "writes time properties" do
+      post = Domain::BlogPost.new do |p|
+        p.time = TimeOfDay.new(5, 30, 35, :am)
+      end
+      subject.save(post, :atomic => true)
+      doc = find_in_db(:blog_post, post.monger_id)
+      doc['time']['hour'].should eq 5
+      doc['time']['minute'].should eq 30
+      doc['time']['second'].should eq 35
     end
 
     it "correctly add references to existing entities when inserting a new entity" do

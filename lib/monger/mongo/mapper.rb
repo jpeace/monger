@@ -55,6 +55,8 @@ module Monger
           case prop.mode
           when :direct, :date
             doc[name.to_s] = value
+          when :time
+            doc[name.to_s] = {'hour' => value.hour, 'minute' => value.minute, 'second' => value.second}
           when :reference
             if prop.inline?
               doc[name.to_s] = save(value, :inline => true)
@@ -129,6 +131,9 @@ module Monger
           case prop.mode
           when :direct, :date
             obj.set_property(name, mongo_doc[name.to_s])
+          when :time
+            time_obj = mongo_doc[name.to_s]
+            obj.set_property(name, TimeOfDay.new(time_obj['hour'], time_obj['minute'], time_obj['second'])) unless time_obj.nil?
           when :reference
             if prop.inline?
               doc = mongo_doc[name.to_s]
