@@ -31,6 +31,7 @@ module Database
     'author_id' => user1.monger_id, 
     'body' => 'Here is a post',
     'date' => Time.utc(2012, 5, 16),
+    'time' => {'hour' => 21, 'minute' => 30, 'second' => 0},
     'tags' => [
       {'name' => 'tag1'}, 
       {'name' => 'tag2'}

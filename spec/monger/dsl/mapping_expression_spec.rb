@@ -26,6 +26,13 @@ describe Monger::Dsl::MappingExpression do
     property.mode.should eq :date
   end
 
+  it "builds time properties" do
+    subject.time :time
+    property = subject.map.properties[:time]
+    property.name.should eq :time
+    property.mode.should eq :time
+  end
+
   it "builds reference properties" do
     subject.has_a :author, :type => :user
     property = subject.map.properties[:author]

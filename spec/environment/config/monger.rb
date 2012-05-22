@@ -17,6 +17,7 @@ end
 map :blog_post do |p|
   p.properties :title, :body
   p.date :date
+  p.time :time
   p.has_a :author, :type => :user, :delete => true
   p.has_many :comments, :type => :comment, :update => true, :delete => true
   p.has_many :tags, :type => :tag, :inline => true
