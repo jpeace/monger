@@ -240,6 +240,22 @@ describe Monger::Mongo::Mapper do
       post_ids.should be_include(post2.monger_id)
     end
 
+    it "inserts new elements when writing inverse collections" do
+      post1 = Domain::BlogPost.new do |p|
+        p.title = 'Post1'
+      end
+      user = Domain::Auth::User.new do |u|
+        u.name = 'Test'
+        u.likes = [post1]
+      end
+      subject.save(user, :atomic => true)
+
+      doc = find_in_db(:user, user.monger_id)
+      post_id = doc['likes'][0]
+      post = find_in_db(:blog_post, post_id)
+      post['title'].should eq 'Post1'
+    end
+
     it "preserves the order of inverse collections" do
       post1 = Domain::BlogPost.new do |p|
         p.title = 'Post1'

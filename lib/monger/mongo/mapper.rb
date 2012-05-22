@@ -71,6 +71,7 @@ module Monger
                 doc[name.to_s] << save(el, :inline => true)
               elsif prop.inverse?
                 doc[name.to_s] ||= []
+                save(el) if el.monger_id.nil?
                 doc[name.to_s] << el.monger_id if el.respond_to? :monger_id
               else
                 if el.monger_id.nil? || prop.update?
