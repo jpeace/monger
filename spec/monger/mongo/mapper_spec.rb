@@ -126,6 +126,23 @@ describe Monger::Mongo::Mapper do
       doc['message'].should eq 'Comment!'
     end
 
+    it "does not destroy one to many relationships when editing collection members" do
+      post = Domain::BlogPost.new do |p|
+        p.title = 'New Post'
+        p.comments = [Domain::Comment.new {|c| c.message = 'Comment!'}]
+      end
+      subject.save(post, :atomic => true)
+
+      comment_id = post.comments[0].monger_id
+      comment = subject.find_by_id(:comment, comment_id)
+      comment.message = 'Changed!'
+      subject.save(comment, :atomic => true)
+
+      post = subject.find_by_id(:blog_post, post.monger_id)
+      post.comments.should have_exactly(1).items
+      post.comments[0].message.should eq 'Changed!'
+    end
+
     it "writes date properties" do
       post = Domain::BlogPost.new do |p|
         p.date = Time.utc(2012, 5, 16)

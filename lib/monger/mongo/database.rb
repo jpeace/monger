@@ -30,7 +30,12 @@ module Monger
         @config.mongo_hooks[:before_write].each {|proc| proc.call(type, doc)} unless skip_hooks
         puts "Mongo Update: #{type.inspect} #{doc.inspect}" if @config.verbose?
 
-        @db[type.to_s].update({'_id'=>doc.monger_id}, doc)
+        # $set operator does not work when an id is passed
+        id = doc.monger_id
+        doc.delete(:_id)
+        doc.delete('_id')
+        
+        @db[type.to_s].update({'_id'=>id}, {'$set' => doc})
         @db.get_last_error if options[:atomic]
       end
 
