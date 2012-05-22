@@ -21,7 +21,7 @@ Test.Cache = new (function() {
   };
 
   this.getAll = function(entity) {
-    return this.dict[entity];
+    return this.dict[entity] != undefined ? this.dict[entity] : new Array();
   }
 
   this.set = function(entity, id, obj) {
