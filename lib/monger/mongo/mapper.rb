@@ -147,6 +147,7 @@ module Monger
                 # Preserve order of collection
                 docs = []
                 tmp_docs = @db.find(prop.type, {'_id' => {'$in' => ids}}, options).to_a
+
                 ids.each do |id|
                   docs << tmp_docs.select {|doc| doc['_id'] == id}.first
                 end
@@ -155,6 +156,8 @@ module Monger
               docs = @db.find(prop.type, {"#{prop.ref_name}_id" => mongo_doc.monger_id}, options)
             end
             docs ||= []
+
+            docs = docs.select {|doc| !doc.nil?}
 
             docs.each do |doc|
               mapped = doc_to_entity(prop.type, doc, :depth => new_depth, :ignore => ignore, :skip_hooks => options[:skip_hooks]) 

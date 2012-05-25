@@ -61,6 +61,29 @@ describe Monger::Mongo::Mapper do
       user.likes.should have_exactly(2).items
     end
 
+    it "doesn't read removed items from an inversed collection" do
+      post1 = Domain::BlogPost.new do |p|
+        p.title = 'Post1'
+      end
+      post2 = Domain::BlogPost.new do |p|
+        p.title = 'Post2'
+      end
+      subject.save(post1, :atomic => true)
+      subject.save(post2, :atomic => true)
+
+      user = Domain::Auth::User.new do |u|
+        u.name = 'Test'
+        u.likes = [post1, post2]
+      end
+      subject.save(user, :atomic => true)
+
+      subject.delete(:blog_post, post1.monger_id, :atomic=>true)
+      user = subject.find_by_id(:user, user.monger_id)
+
+      user.likes.should have_exactly(1).items
+      user.likes[0].title.should eq('Post2')
+    end
+
     it "reads to a given depth" do
       post = subject.find_by_id(:blog_post, Database::blog_post_id, :depth => 2)
       post.author.posts.first.title.should eq 'Blog Post'
