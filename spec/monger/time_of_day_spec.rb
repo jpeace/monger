@@ -59,4 +59,12 @@ describe TimeOfDay do
     time = described_class.from_time(ruby_time)
     time.to_12_hour.should eq "3:30:45 PM"
   end
+
+  it "can build a time of day from strings" do
+    time = described_class.from_string('9:30 pm')
+    time.to_12_hour.should eq "9:30 PM"
+
+    time = described_class.from_string('4:35:20 AM')
+    time.to_12_hour.should eq "4:35:20 AM"
+  end
 end

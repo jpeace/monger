@@ -40,6 +40,11 @@ describe Monger::Mongo::Mapper do
       post.date.should eq Time.utc(2012, 5, 16)
     end
 
+    it "reads time properties" do
+      post = subject.find_by_id(:blog_post, Database::blog_post_id)
+      post.time.to_12_hour.should eq '9:30 PM'
+    end
+
     it "reads reference properties" do
       post = subject.find_by_id(:blog_post, Database::blog_post_id)
       post.author.should be_is_a Domain::Auth::User
@@ -144,6 +149,23 @@ describe Monger::Mongo::Mapper do
       doc['message'].should eq 'Comment!'
     end
 
+    it "does not destroy one to many relationships when editing collection members" do
+      post = Domain::BlogPost.new do |p|
+        p.title = 'New Post'
+        p.comments = [Domain::Comment.new {|c| c.message = 'Comment!'}]
+      end
+      subject.save(post, :atomic => true)
+
+      comment_id = post.comments[0].monger_id
+      comment = subject.find_by_id(:comment, comment_id)
+      comment.message = 'Changed!'
+      subject.save(comment, :atomic => true)
+
+      post = subject.find_by_id(:blog_post, post.monger_id)
+      post.comments.should have_exactly(1).items
+      post.comments[0].message.should eq 'Changed!'
+    end
+
     it "writes date properties" do
       post = Domain::BlogPost.new do |p|
         p.date = Time.utc(2012, 5, 16)
@@ -151,6 +173,17 @@ describe Monger::Mongo::Mapper do
       subject.save(post, :atomic => true)
       doc = find_in_db(:blog_post, post.monger_id)
       doc['date'].should eq Time.utc(2012, 5, 16)
+    end
+
+    it "writes time properties" do
+      post = Domain::BlogPost.new do |p|
+        p.time = TimeOfDay.new(5, 30, 35, :am)
+      end
+      subject.save(post, :atomic => true)
+      doc = find_in_db(:blog_post, post.monger_id)
+      doc['time']['hour'].should eq 5
+      doc['time']['minute'].should eq 30
+      doc['time']['second'].should eq 35
     end
 
     it "correctly add references to existing entities when inserting a new entity" do
@@ -245,6 +278,22 @@ describe Monger::Mongo::Mapper do
       post_ids = doc['likes']
       post_ids.should be_include(post1.monger_id)
       post_ids.should be_include(post2.monger_id)
+    end
+
+    it "inserts new elements when writing inverse collections" do
+      post1 = Domain::BlogPost.new do |p|
+        p.title = 'Post1'
+      end
+      user = Domain::Auth::User.new do |u|
+        u.name = 'Test'
+        u.likes = [post1]
+      end
+      subject.save(user, :atomic => true)
+
+      doc = find_in_db(:user, user.monger_id)
+      post_id = doc['likes'][0]
+      post = find_in_db(:blog_post, post_id)
+      post['title'].should eq 'Post1'
     end
 
     it "preserves the order of inverse collections" do

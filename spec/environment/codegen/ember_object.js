@@ -6,6 +6,7 @@ comments:[],
 date:'',
 relatedLinks:'',
 tags:[],
+time:'',
 title:'',
 
   isNew:function() { return !this.id; }.property('id'),
@@ -34,6 +35,7 @@ comments:comments,
 date:this.date,
 relatedLinks:relatedLinks,
 tags:tags,
+time:this.time,
 title:this.title
     };
   }

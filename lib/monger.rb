@@ -6,6 +6,7 @@ require 'monger/ember'
 require 'monger/json'
 require 'monger/version'
 
+require 'time'
 class TimeOfDay
   attr_accessor :hour, :minute, :second
 
@@ -56,6 +57,10 @@ class TimeOfDay
 
   def self.from_time(time)
     TimeOfDay.new(time.hour, time.min, time.sec)
+  end
+
+  def self.from_string(s)
+    TimeOfDay.from_time(Time.parse(s))
   end
 end
 

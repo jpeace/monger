@@ -21,7 +21,11 @@ Test.Cache = new (function() {
   };
 
   this.getAll = function(entity) {
-    return this.dict[entity];
+    var entityList = new Array();
+    for (var key in this.dict[entity]) {
+      entityList.push(this.dict[entity][key]);
+    }
+    return entityList;
   }
 
   this.set = function(entity, id, obj) {

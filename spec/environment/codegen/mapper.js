@@ -13,6 +13,7 @@ if (obj.comments) {
 var date = obj.date;
 var relatedLinks = obj.relatedLinks;
 var tags = obj.tags;
+var time = obj.time;
 var title = obj.title;
 
   Test.Cache.set('blogPost', obj.id,
@@ -24,6 +25,7 @@ comments:comments,
 date:date,
 relatedLinks:relatedLinks,
 tags:tags,
+time:time,
 title:title
     })
   );
