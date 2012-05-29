@@ -19,22 +19,14 @@ var comments = [];
 for (var i = 0 ; i < this.comments.length ; ++i) {
   comments.push(this.comments[i].serialize());
 }
-var relatedLinks = null;
-if (this.relatedLinks) {
-  relatedLinks = this.relatedLinks.serialize();
-}
-var tags = [];
-for (var i = 0 ; i < this.tags.length ; ++i) {
-  tags.push(this.tags[i].serialize());
-}
     return {
 id:this.id,
 author:author,
 body:this.body,
 comments:comments,
 date:this.date,
-relatedLinks:relatedLinks,
-tags:tags,
+relatedLinks:this.relatedLinks,
+tags:this.tags,
 time:this.time,
 title:this.title
     };
