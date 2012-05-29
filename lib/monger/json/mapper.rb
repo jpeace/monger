@@ -26,6 +26,8 @@ module Monger
               hash[js_name] = val
             when :date
               hash[js_name] = val.strftime('%-m/%-d/%Y')
+            when :time
+              hash[js_name] = val.to_12_hour
             when :reference
               hash[js_name] = get_hash(val) unless val.nil?
             when :collection
@@ -60,6 +62,8 @@ module Monger
             if pieces.length == 3
               obj.set_property(name, Time.utc(pieces[2], pieces[0], pieces[1]))
             end
+          when :time
+            obj.set_property(name, TimeOfDay.from_string(val))
           when :reference
             obj.set_property(name, from_hash(prop.type, val))
           when :collection

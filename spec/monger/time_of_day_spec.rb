@@ -67,4 +67,10 @@ describe TimeOfDay do
     time = described_class.from_string('4:35:20 AM')
     time.to_12_hour.should eq "4:35:20 AM"
   end
+
+  it "properly evaluates equality" do
+    time1 = described_class.new(9, 30, 45, :pm)
+    time2 = described_class.new(9, 30, 45, :pm)
+    time1.should eq time2
+  end
 end

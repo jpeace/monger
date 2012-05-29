@@ -62,6 +62,10 @@ class TimeOfDay
   def self.from_string(s)
     TimeOfDay.from_time(Time.parse(s))
   end
+
+  def ==(compare)
+    @hour == compare.hour && @minute == compare.minute && @second == compare.second
+  end
 end
 
 module Monger
