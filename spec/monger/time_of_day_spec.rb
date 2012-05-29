@@ -54,6 +54,12 @@ describe TimeOfDay do
     time.to_12_hour.should eq "12:00 AM"
   end
 
+  it "displays correctly when given floats" do
+    time = described_class.new(9.0, 5.0, 25.0)
+    time.to_12_hour.should eq "9:05:25 AM"
+    time.to_24_hour.should eq "9:05:25"
+  end
+
   it "can build a time of day from a ruby time object" do
     ruby_time = Time.new(2012, 5, 16, 15, 30, 45)
     time = described_class.from_time(ruby_time)

@@ -35,9 +35,9 @@ class TimeOfDay
     minute = '%02d' % @minute
     second = '%02d' % @second
     if @second == 0
-      "#{hour}:#{minute} #{period}"
+      "#{hour.to_i}:#{minute} #{period}"
     else
-      "#{hour}:#{minute}:#{second} #{period}"
+      "#{hour.to_i}:#{minute}:#{second} #{period}"
     end
   end
 
@@ -45,9 +45,9 @@ class TimeOfDay
     minute = '%02d' % @minute
     second = '%02d' % @second
     if @second == 0
-      "#{@hour}:#{minute}"
+      "#{@hour.to_i}:#{minute}"
     else
-      "#{@hour}:#{minute}:#{second}"
+      "#{@hour.to_i}:#{minute}:#{second}"
     end
   end
 
