@@ -34,7 +34,9 @@ Test.Cache = new (function() {
       this.dict[entity][id] = obj;
     } else {
       this.eachProperty(this, obj, function(prop) {
-        this.dict[entity][id].set(prop, obj[prop]);
+        if (this.dict[entity][id].get(prop) == '' || this.dict[entity][id].get(prop) == []) {
+          this.dict[entity][id].set(prop, obj[prop]);
+        }
       })
     }
   };
