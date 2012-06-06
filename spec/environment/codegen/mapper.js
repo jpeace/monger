@@ -16,8 +16,7 @@ var tags = obj.tags;
 var time = obj.time;
 var title = obj.title;
 
-  Test.Cache.set('blogPost', obj.id,
-    Test.Domain.BlogPost.create({
+var entity = Test.Domain.BlogPost.create({
 id:obj.id,
 author:author,
 body:body,
@@ -27,7 +26,10 @@ relatedLinks:relatedLinks,
 tags:tags,
 time:time,
 title:title
-    })
-  );
-  return Test.Cache.get('blogPost', obj.id);
+});
+
+  if (obj.id) {
+    Test.Cache.set('blogPost', obj.id, entity);
+  }
+  return entity;
 };
