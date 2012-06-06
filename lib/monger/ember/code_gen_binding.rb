@@ -87,17 +87,9 @@ for (var i = 0 ; i < this.#{js_name}.length ; ++i) {
         when :direct, :date, :time
           direct_mapper(name)
         when :reference
-          if prop.inline?
-            direct_mapper(name)
-          else
-            reference_mapper(name, prop.type)
-          end
+          reference_mapper(name, prop.type)
         when :collection
-          if prop.inline?
-            direct_mapper(name)
-          else
-            collection_mapper(name, prop.type)
-          end
+          collection_mapper(name, prop.type)
         end
       end
 

@@ -11,8 +11,13 @@ if (obj.comments) {
   }
 }
 var date = obj.date;
-var relatedLinks = obj.relatedLinks;
-var tags = obj.tags;
+var relatedLinks = Test.Mappers.related(obj.relatedLinks);
+var tags = [];
+if (obj.tags) {
+  for (var i = 0 ; i < obj.tags.length ; ++i) {
+    tags.push(Test.Mappers.tag(obj.tags[i]));
+  }
+}
 var time = obj.time;
 var title = obj.title;
 

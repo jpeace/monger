@@ -98,11 +98,17 @@ if (obj.comments) {
     end
 
     it "works with inline reference properties" do
-      subject.property_mapper_for(:related_links).should eq 'var relatedLinks = obj.relatedLinks;'
+      subject.property_mapper_for(:related_links).should eq 'var relatedLinks = Test.Mappers.related(obj.relatedLinks);'
     end
 
     it "works with inline collection properties" do
-      subject.property_mapper_for(:tags).should eq 'var tags = obj.tags;'
+      tag_mapper = %{var tags = [];
+if (obj.tags) {
+  for (var i = 0 ; i < obj.tags.length ; ++i) {
+    tags.push(Test.Mappers.tag(obj.tags[i]));
+  }
+}}
+      subject.property_mapper_for(:tags).should eq tag_mapper
     end
   end
 end
