@@ -1,4 +1,9 @@
 class SingleClass
+  attr_accessor :s
+  def build
+    @s = 'original'
+    @s.build_class_name
+  end
 end
 
 class FairlyLongClassName
@@ -56,5 +61,13 @@ describe "String patches" do
 
   it "can build a Javascript name from a long string" do
     'much_longer_string'.build_javascript_name.should eq 'muchLongerString'
+  end
+
+  context "when building class names using instance variables" do
+    it "does not modify the string in place" do
+      c = SingleClass.new
+      c.build
+      c.s.should eq 'original'
+    end
   end
 end

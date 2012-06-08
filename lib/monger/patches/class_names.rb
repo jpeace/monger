@@ -23,7 +23,7 @@ class String
   end
 
   def build_javascript_name
-    class_name = self
+    class_name = self.clone
     separator = /_(\w)/
     class_name.scan(separator).count.times do
       pieces = class_name.partition(separator)
