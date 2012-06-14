@@ -14,6 +14,10 @@ module Monger
         find(type, {}, options)
       end
 
+      def find_one(type, criteria, options={})
+        find(type, criteria, options).first
+      end
+
       def find_by_id(type, id, options={})
         id = id.to_monger_id if id.is_a? String
         find(type, {'_id' => id}, options).first
