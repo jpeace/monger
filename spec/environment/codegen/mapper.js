@@ -11,13 +11,17 @@ if (obj.comments) {
   }
 }
 var date = obj.date;
-var relatedLinks = obj.relatedLinks;
-var tags = obj.tags;
+var relatedLinks = Test.Mappers.related(obj.relatedLinks);
+var tags = [];
+if (obj.tags) {
+  for (var i = 0 ; i < obj.tags.length ; ++i) {
+    tags.push(Test.Mappers.tag(obj.tags[i]));
+  }
+}
 var time = obj.time;
 var title = obj.title;
 
-  Test.Cache.set('blogPost', obj.id,
-    Test.Domain.BlogPost.create({
+var entity = Test.Domain.BlogPost.create({
 id:obj.id,
 author:author,
 body:body,
@@ -27,7 +31,10 @@ relatedLinks:relatedLinks,
 tags:tags,
 time:time,
 title:title
-    })
-  );
-  return Test.Cache.get('blogPost', obj.id);
+});
+
+  if (obj.id) {
+    Test.Cache.set('blogPost', obj.id, entity);
+  }
+  return entity;
 };

@@ -29,6 +29,7 @@ module Monger
         inline = options[:inline] || false
         delete = options[:delete] || false
         inverse = options[:inverse] || false
+        always_read = options[:always_read] || false
         @properties[name] = Property.new do |p|
           p.name = name
           p.mode = mode
@@ -38,6 +39,7 @@ module Monger
           p.inline = inline
           p.delete = delete
           p.inverse = inverse
+          p.always_read = always_read
         end
       end
     end

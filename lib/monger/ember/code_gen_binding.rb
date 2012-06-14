@@ -46,7 +46,7 @@ module Monger
       end
 
       def serialization_setup
-        properties.select{|n,p| ![:direct,:date,:time].include?(p.mode) && !p.inline? }.map do |name, prop|
+        properties.select{|n,p| ![:direct,:date,:time].include?(p.mode)}.map do |name, prop|
           js_name = name.build_javascript_name
           if (prop.mode == :reference)
 %{var #{js_name} = null;
@@ -69,11 +69,7 @@ for (var i = 0 ; i < this.#{js_name}.length ; ++i) {
           when :direct, :date, :time
             "#{name.build_javascript_name}:this.#{name.build_javascript_name}"
           when :reference, :collection
-            if prop.inline?
-              "#{name.build_javascript_name}:this.#{name.build_javascript_name}"
-            else
-              "#{name.build_javascript_name}:#{name.build_javascript_name}"
-            end
+            "#{name.build_javascript_name}:#{name.build_javascript_name}"
           end
         end.join(",\n")
       end
@@ -91,17 +87,9 @@ for (var i = 0 ; i < this.#{js_name}.length ; ++i) {
         when :direct, :date, :time
           direct_mapper(name)
         when :reference
-          if prop.inline?
-            direct_mapper(name)
-          else
-            reference_mapper(name, prop.type)
-          end
+          reference_mapper(name, prop.type)
         when :collection
-          if prop.inline?
-            direct_mapper(name)
-          else
-            collection_mapper(name, prop.type)
-          end
+          collection_mapper(name, prop.type)
         end
       end
 

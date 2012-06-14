@@ -121,8 +121,9 @@ module Monger
       def doc_to_entity(type, mongo_doc, options={})
         depth = options[:depth] || 1
         ignore = options[:ignore] || []
+        ignore_depth = options[:override_depth] || false
 
-        return nil if depth < 0
+        return nil unless depth >= 0 || ignore_depth
 
         obj = @config.build_object_of_type(type)
         obj.monger_id = mongo_doc.monger_id
@@ -131,6 +132,8 @@ module Monger
 
         map.properties.each do |name, prop|
           next if ignore.include? name
+
+          override_depth = prop.always_read?
           
           new_depth = prop.inline? ? depth : depth - 1
           case prop.mode
@@ -145,7 +148,7 @@ module Monger
             else
               doc = @db.find(prop.type, {'_id' => mongo_doc["#{name}_id"]}, options).first
             end
-            obj.set_property(name, doc_to_entity(prop.type, doc, :depth => new_depth, :ignore => ignore, :skip_hooks => options[:skip_hooks])) unless doc.nil?
+            obj.set_property(name, doc_to_entity(prop.type, doc, :depth => new_depth, :ignore => ignore, :skip_hooks => options[:skip_hooks], :override_depth => override_depth)) unless doc.nil?
           when :collection
             coll = []
             
@@ -170,7 +173,7 @@ module Monger
             docs = docs.select {|doc| !doc.nil?}
 
             docs.each do |doc|
-              mapped = doc_to_entity(prop.type, doc, :depth => new_depth, :ignore => ignore, :skip_hooks => options[:skip_hooks]) 
+              mapped = doc_to_entity(prop.type, doc, :depth => new_depth, :ignore => ignore, :skip_hooks => options[:skip_hooks], :override_depth => override_depth) 
               coll << mapped unless mapped.nil?
             end
             obj.set_property(name, coll)

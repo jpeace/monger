@@ -92,7 +92,7 @@ describe Monger::Mongo::Mapper do
     it "reads to a given depth" do
       post = subject.find_by_id(:blog_post, Database::blog_post_id, :depth => 2)
       post.author.posts.first.title.should eq 'Blog Post'
-      post.author.posts.first.author.should be_nil
+      post.author.posts.first.comments.should be_empty
     end
 
     it "reads inline properties" do
@@ -106,9 +106,15 @@ describe Monger::Mongo::Mapper do
 
     it "ignores depth for inline properties" do
       post = subject.find_by_id(:blog_post, Database::blog_post_id, :depth => 0)
-      post.author.should be_nil
+      post.comments.should be_empty
       post.related_links.urls.should eq ['http://www.google.com']
       post.tags.should have_exactly(2).items
+    end
+
+    it "can be configured to always read certain properties" do
+      post = subject.find_by_id(:blog_post, Database::blog_post_id, :depth => 0)
+      post.comments.should be_empty
+      post.author.should_not be_nil
     end
 
     it "can be configured to ignore certain mappings" do
