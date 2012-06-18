@@ -21,12 +21,19 @@ Test.Cache = new (function() {
   };
 
   this.getAll = function(entity) {
-    var entityList = new Array();
+    this.ensure(entity);
+    return this.dict[entity];
+  };
+
+  this.getBy = function(entity, prop, val) {
+    this.ensure(entity);
     for (var key in this.dict[entity]) {
-      entityList.push(this.dict[entity][key]);
+      if (this.dict[entity][key][prop] == val) {
+        return this.dict[entity][key];
+      }
     }
-    return entityList;
-  }
+    return null;
+  };
 
   this.set = function(entity, id, obj) {
     this.ensure(entity);
