@@ -59,11 +59,16 @@ module Monger
       @@finds = []
 
       def self.reset
+        puts "Resetting database"
         @@finds = []
       end
 
       def self.finds
         @@finds
+      end
+
+      def self.finds_of_type(type)
+        @@finds.select{|f| f.type == type}
       end
 
       alias old_find find

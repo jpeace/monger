@@ -29,17 +29,17 @@ module Monger
 
       def delete(type, id, options={})
         id = id.to_monger_id if id.is_a? String
-        entity = find_by_id(type, id)
-        remove_references(entity)
-        remove_collections(type, id)
-        @db.delete(type, {'_id' => id}, options)
+        remove_entity(find_by_id(type, id), options)
       end
 
       def remove_entity(entity, options={})
         if entity.respond_to? :monger_id
           type = entity.class.build_symbol
           id = entity.monger_id
-          delete(type, id, options)
+          
+          remove_references(entity)
+          remove_collections(type, id)
+          @db.delete(type, {'_id' => id}, options)
         end
       end
 
@@ -106,6 +106,8 @@ module Monger
       private
 
       def remove_references(entity)
+        return if entity.nil?
+
         type = entity.class.build_symbol
         map = @config.maps[type]
         map.reference_properties.each do |name, prop|
@@ -118,6 +120,8 @@ module Monger
 
       def remove_collections(type, id)
         map = @config.maps[type]
+        return if map.nil?
+
         map.collection_properties.each do |name, prop|
           if prop.delete?
             collection = find(prop.type, {"#{prop.ref_name}_id" => id})
@@ -129,21 +133,24 @@ module Monger
       def doc_to_entity(type, mongo_doc, options={})
         depth = options[:depth] || 1
         ignore = options[:ignore] || []
-        ignore_depth = options[:override_depth] || false
-
-        return nil unless depth >= 0 || ignore_depth
 
         obj = @config.build_object_of_type(type)
         obj.monger_id = mongo_doc.monger_id
         
         map = @config.maps[type]
 
+        new_depth = depth - 1
+
         map.properties.each do |name, prop|
           next if ignore.include? name
 
-          override_depth = prop.always_read?
+          if depth <= 0 && [:reference, :collection].include?(prop.mode)
+            unless (prop.inline? || prop.always_read?)
+              obj.set_property(name, []) if prop.mode == :collection
+              next
+            end
+          end
           
-          new_depth = prop.inline? ? depth : depth - 1
           case prop.mode
           when :direct, :date
             obj.set_property(name, mongo_doc[name.to_s])
@@ -154,9 +161,14 @@ module Monger
             if prop.inline?
               doc = mongo_doc[name.to_s]
             else
-              doc = @db.find(prop.type, {'_id' => mongo_doc["#{name}_id"]}, options).first
+              ref_id = mongo_doc["#{name}_id"]
+              if ref_id.nil?
+                doc = nil
+              else
+                doc = @db.find(prop.type, {'_id' => ref_id}, options).first
+              end
             end
-            obj.set_property(name, doc_to_entity(prop.type, doc, :depth => new_depth, :ignore => ignore, :skip_hooks => options[:skip_hooks], :override_depth => override_depth)) unless doc.nil?
+            obj.set_property(name, doc_to_entity(prop.type, doc, :depth => new_depth, :ignore => ignore, :skip_hooks => options[:skip_hooks])) unless doc.nil?
           when :collection
             coll = []
             
@@ -181,7 +193,7 @@ module Monger
             docs = docs.select {|doc| !doc.nil?}
 
             docs.each do |doc|
-              mapped = doc_to_entity(prop.type, doc, :depth => new_depth, :ignore => ignore, :skip_hooks => options[:skip_hooks], :override_depth => override_depth) 
+              mapped = doc_to_entity(prop.type, doc, :depth => new_depth, :ignore => ignore, :skip_hooks => options[:skip_hooks]) 
               coll << mapped unless mapped.nil?
             end
             obj.set_property(name, coll)

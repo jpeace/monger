@@ -1,6 +1,7 @@
 database 'monger-test'
 host 'localhost'
 port 27017
+debug true
 
 js_namespace 'Test'
 
