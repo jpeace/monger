@@ -348,6 +348,19 @@ describe Monger::Mongo::Mapper do
       find_in_db(:tag, id).should be_nil
     end
 
+    it "can remove entities by reference" do
+      tag = Domain::Tag.new do |t|
+        t.name = 'New Tag'
+      end
+      subject.save(tag, :atomic => true)
+
+      id = tag.monger_id
+      find_in_db(:tag, id).should_not be_nil
+      
+      subject.remove_entity(tag, :atomic => true)
+      find_in_db(:tag, id).should be_nil
+    end
+
     it "removes owned references when marked as such" do
       post = Domain::BlogPost.new do |p|
         p.author = Domain::Auth::User.new {|u| u.name = 'John Doe'}

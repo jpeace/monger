@@ -35,6 +35,14 @@ module Monger
         @db.delete(type, {'_id' => id}, options)
       end
 
+      def remove_entity(entity, options={})
+        if entity.respond_to? :monger_id
+          type = entity.class.build_symbol
+          id = entity.monger_id
+          delete(type, id, options)
+        end
+      end
+
       def save(entity, options={})
         inline = options[:inline] || false
 

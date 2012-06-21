@@ -1,4 +1,5 @@
 require 'mongo'
+require 'ostruct'
 
 module Database
   def self.blog_post_id
@@ -49,5 +50,27 @@ module Database
 
   def find_in_db(type, id)
     @@db[type.to_s].find({'_id' => id}).first
+  end
+end
+
+module Monger
+  module Mongo
+    class Database
+      @@finds = []
+
+      def self.reset
+        @@finds = []
+      end
+
+      def self.finds
+        @@finds
+      end
+
+      alias old_find find
+      def find(type, criteria={}, options={})
+        @@finds << OpenStruct.new(:type => type, :criteria => criteria, :options => options)
+        old_find(type, criteria, options)
+      end
+    end
   end
 end
