@@ -21,8 +21,11 @@
   };
 
   this.getAll = function(entity) {
-    this.ensure(entity);
-    return this.dict[entity];
+    var entityList = new Array();
+    for (var key in this.dict[entity]) {
+      entityList.push(this.dict[entity][key]);
+    }
+    return entityList;
   };
 
   this.getBy = function(entity, prop, val) {
