@@ -1,7 +1,6 @@
 database 'monger-test'
 host 'localhost'
 port 27017
-debug true
 
 js_namespace 'Test'
 
@@ -28,6 +27,7 @@ end
 map :user do |u|
   u.properties :name, :age, :gender
   u.has_many :posts, :type => :blog_post, :ref_name => :author
+  u.has_many :comments, :type => :comment, :read_by_default => false
   u.has_many :likes, :type => :blog_post, :inverse => true
 end
 

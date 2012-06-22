@@ -59,7 +59,6 @@ module Monger
       @@finds = []
 
       def self.reset
-        puts "Resetting database"
         @@finds = []
       end
 

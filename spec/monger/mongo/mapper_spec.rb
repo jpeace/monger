@@ -117,6 +117,22 @@ describe Monger::Mongo::Mapper do
       post.author.should_not be_nil
     end
 
+    it "can be configured to not read certain properties by default" do
+      post = subject.find_by_id(:blog_post, Database::blog_post_id, :depth => 2)
+      post.author.comments.should be_empty
+    end
+
+    it "can be configured to force certain properties to be read" do
+      post = subject.find_by_id(:blog_post, Database::blog_post_id, :depth => 2, :force => [:comments])
+      post.author.comments.should have_exactly(1).items
+
+      post = subject.find_by_id(:blog_post, Database::blog_post_id, :depth => 0, :force => [:comments])
+      post.comments.should have_exactly(2).items
+      post.comments.each do |c|
+        ['A comment', 'Another comment'].should include(c.message)
+      end
+    end
+
     it "can be configured to ignore certain mappings" do
       post = subject.find_by_id(:blog_post, Database::blog_post_id, :ignore => [:tags, :author, :urls])
       post.author.should be_nil

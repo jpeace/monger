@@ -133,6 +133,7 @@ module Monger
       def doc_to_entity(type, mongo_doc, options={})
         depth = options[:depth] || 1
         ignore = options[:ignore] || []
+        force = options[:force] || []
 
         obj = @config.build_object_of_type(type)
         obj.monger_id = mongo_doc.monger_id
@@ -141,14 +142,24 @@ module Monger
 
         new_depth = depth - 1
 
+        new_options = {
+          :depth => new_depth,
+          :ignore => ignore,
+          :force => force,
+          :skip_hooks => options[:skip_hooks]
+        }
+
         map.properties.each do |name, prop|
+          obj.set_property(name, []) if prop.mode == :collection    # Default for collections in case we don't end up mapping
+
           next if ignore.include? name
 
+          unless prop.read_by_default?
+            next unless force.include?(name)
+          end
+
           if depth <= 0 && [:reference, :collection].include?(prop.mode)
-            unless (prop.inline? || prop.always_read?)
-              obj.set_property(name, []) if prop.mode == :collection
-              next
-            end
+            next unless (prop.inline? || prop.always_read? || force.include?(name))
           end
           
           case prop.mode
@@ -168,7 +179,7 @@ module Monger
                 doc = @db.find(prop.type, {'_id' => ref_id}, options).first
               end
             end
-            obj.set_property(name, doc_to_entity(prop.type, doc, :depth => new_depth, :ignore => ignore, :skip_hooks => options[:skip_hooks])) unless doc.nil?
+            obj.set_property(name, doc_to_entity(prop.type, doc, new_options)) unless doc.nil?
           when :collection
             coll = []
             
@@ -193,7 +204,7 @@ module Monger
             docs = docs.select {|doc| !doc.nil?}
 
             docs.each do |doc|
-              mapped = doc_to_entity(prop.type, doc, :depth => new_depth, :ignore => ignore, :skip_hooks => options[:skip_hooks]) 
+              mapped = doc_to_entity(prop.type, doc, new_options) 
               coll << mapped unless mapped.nil?
             end
             obj.set_property(name, coll)

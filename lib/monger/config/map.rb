@@ -30,6 +30,7 @@ module Monger
         delete = options[:delete] || false
         inverse = options[:inverse] || false
         always_read = options[:always_read] || false
+        read_by_default = options[:read_by_default].nil? ? true : options[:read_by_default]
         @properties[name] = Property.new do |p|
           p.name = name
           p.mode = mode
@@ -40,6 +41,7 @@ module Monger
           p.delete = delete
           p.inverse = inverse
           p.always_read = always_read
+          p.read_by_default = read_by_default
         end
       end
     end

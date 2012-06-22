@@ -8,7 +8,6 @@ describe Monger::Mongo::Mapper do
     subject.save(t)
   end
   def destroy_tag
-    puts "Cleaning up"
     t = subject.find_one(:tag, {:name => 'TEST TAG'})
     subject.remove_entity(t)
   end
@@ -24,7 +23,6 @@ describe Monger::Mongo::Mapper do
     subject.save(p)
   end
   def destroy_post
-    puts "Cleaning up"
     u = subject.find_one(:user, {:name => 'TEST USER'})
     subject.remove_entity(u) unless u.nil?
     p = subject.find_one(:blog_post, {:title => 'TEST POST'})
