@@ -32,5 +32,5 @@ map :user do |u|
 end
 
 map :comment do |c|
-  c.properties :message
+  c.properties :message, :important
 end

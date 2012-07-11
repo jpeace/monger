@@ -164,7 +164,7 @@ module Monger
           
           case prop.mode
           when :direct, :date
-            obj.set_property(name, mongo_doc[name.to_s])
+            obj.set_property(name, mongo_doc[name.to_s]) if mongo_doc.has_key?(name.to_s)
           when :time
             time_obj = mongo_doc[name.to_s]
             obj.set_property(name, TimeOfDay.new(time_obj['hour'], time_obj['minute'], time_obj['second'])) unless time_obj.nil?

@@ -44,7 +44,7 @@ module Database
   @@db['blog_post'].insert(post)
 
   comment1 = {'user_id' => user1.monger_id, 'message' => 'A comment', 'blog_post_id' => post.monger_id}
-  comment2 = {'user_id' => user2.monger_id, 'message' => 'Another comment', 'blog_post_id' => post.monger_id}
+  comment2 = {'user_id' => user2.monger_id, 'message' => 'Another comment', 'blog_post_id' => post.monger_id, 'important' => nil}
   @@db['comment'].insert(comment1)
   @@db['comment'].insert(comment2)
 

@@ -139,6 +139,16 @@ describe Monger::Mongo::Mapper do
       post.tags.should be_empty
       post.related_links.urls.should be_empty
     end
+
+    it "doesn't map properties when they don't exist in the document" do
+      comment = subject.find_one(:comment, {:message => 'A comment'})
+      comment.important.should be_true
+    end
+
+    it "does map nil properties" do
+      comment = subject.find_one(:comment, {:message => 'Another comment'})
+      comment.important.should be_nil
+    end
   end
 
   context "when writing" do

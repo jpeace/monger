@@ -26,8 +26,9 @@ module Domain
   end
 
   class Comment
-    attr_accessor :user, :message
+    attr_accessor :user, :message, :important
     def initialize
+      @important = true
       yield self if block_given?
     end
   end
