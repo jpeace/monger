@@ -149,6 +149,16 @@ describe Monger::Mongo::Mapper do
       comment = subject.find_one(:comment, {:message => 'Another comment'})
       comment.important.should be_nil
     end
+
+    it "supports limits" do
+      comments = subject.find(:comment, {}, :limit => 1)
+      comments.should have_exactly(1).items
+    end
+
+    it "can handle bad limits" do
+      comments = subject.find(:comment, {}, :limit => 'not really a limit')
+      comments.should have_exactly(2).items
+    end
   end
 
   context "when writing" do

@@ -13,7 +13,11 @@ module Monger
         @config.mongo_hooks[:before_read].each {|proc| proc.call(type, criteria)} unless skip_hooks
         puts "Mongo Find: #{type.inspect} #{criteria.inspect}" if @config.verbose?
  
-        @db[type.to_s].find(criteria)
+        mongo_options = {}
+        unless options[:limit].nil? || !options[:limit].is_a?(Fixnum)
+          mongo_options[:limit] = options[:limit]
+        end
+        @db[type.to_s].find(criteria, mongo_options)
       end
 
       def insert(type, doc, options={})
