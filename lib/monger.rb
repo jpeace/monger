@@ -28,9 +28,12 @@ class TimeOfDay
     @second = second
   end
 
-  def to_12_hour
+  def to_12_hour(options={})
+    offset = options[:offset] || 0
+
+    hour = @hour + offset
     period = (hour >= 12) ? 'PM' : 'AM'
-    hour = @hour % 12
+    hour = hour % 12
     hour = 12 if hour == 0
     minute = '%02d' % @minute
     second = '%02d' % @second
@@ -41,13 +44,16 @@ class TimeOfDay
     end
   end
 
-  def to_24_hour
+  def to_24_hour(options={})
+    offset = options[:offset] ||0
+
+    hour = @hour + offset
     minute = '%02d' % @minute
     second = '%02d' % @second
     if @second == 0
-      "#{@hour.to_i}:#{minute}"
+      "#{hour.to_i}:#{minute}"
     else
-      "#{@hour.to_i}:#{minute}:#{second}"
+      "#{hour.to_i}:#{minute}:#{second}"
     end
   end
 

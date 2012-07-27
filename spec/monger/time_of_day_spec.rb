@@ -60,6 +60,12 @@ describe TimeOfDay do
     time.to_24_hour.should eq "9:05:25"
   end
 
+  it "displays time with a timezone offset" do
+    time = described_class.new(3, 30, 25, :pm)
+    time.to_12_hour(:offset => -5).should eq "10:30:25 AM"
+    time.to_24_hour(:offset => 3).should eq "18:30:25"
+  end
+
   it "can build a time of day from a ruby time object" do
     ruby_time = Time.new(2012, 5, 16, 15, 30, 45)
     time = described_class.from_time(ruby_time)
