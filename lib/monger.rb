@@ -32,6 +32,9 @@ class TimeOfDay
     offset = options[:offset] || 0
 
     hour = @hour + offset
+    hour += 24 if hour < 0
+    hour -= 24 if hour >= 24
+
     period = (hour >= 12) ? 'PM' : 'AM'
     hour = hour % 12
     hour = 12 if hour == 0
@@ -48,6 +51,9 @@ class TimeOfDay
     offset = options[:offset] ||0
 
     hour = @hour + offset
+    hour += 24 if hour < 0
+    hour -= 24 if hour >= 24
+    
     minute = '%02d' % @minute
     second = '%02d' % @second
     if @second == 0
@@ -58,7 +64,7 @@ class TimeOfDay
   end
 
   def self.now
-    TimeOfDay.from_time(Time.now)
+    TimeOfDay.from_time(Time.now.utc)
   end
 
   def self.from_time(time)
