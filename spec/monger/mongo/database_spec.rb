@@ -57,4 +57,9 @@ describe Monger::Mongo::Database do
     @subject.update(:test, doc, :skip_hooks => true)
     doc['new_field'].should be_nil
   end
+
+  it "supports limits" do
+    docs = @subject.find(:test, {}, :limit => 1)
+    docs.count(true).should eq 1
+  end
 end
