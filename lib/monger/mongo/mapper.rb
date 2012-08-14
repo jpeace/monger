@@ -19,8 +19,12 @@ module Monger
       end
 
       def find_by_id(type, id, options={})
-        id = id.to_monger_id if id.is_a? String
-        find(type, {'_id' => id}, options).first
+        begin
+          id = id.to_monger_id if id.is_a? String
+          find(type, {'_id' => id}, options).first
+        rescue BSON::InvalidObjectId
+          return nil
+        end
       end
 
       def search(type, term, options={})

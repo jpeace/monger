@@ -24,6 +24,11 @@ describe Monger::Mongo::Mapper do
       post.title.should eq 'Blog Post'
     end
 
+    it "returns null for an invalid BSON id" do
+      post = subject.find_by_id(:blog_post, 'bad format')
+      post.should be_nil
+    end
+
     it "adds a monger id" do
       post = subject.find_by_id(:blog_post, Database::blog_post_id)
       post.monger_id.should eq Database::blog_post_id.to_monger_id
