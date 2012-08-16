@@ -15,7 +15,9 @@ module Monger
       end
 
       def find_one(type, criteria, options={})
-        find(type, criteria, options).first
+        options.merge!({:limit => 1})
+        doc = @db.find(type, criteria, options).first
+        doc_to_entity(type, doc, options)
       end
 
       def find_by_id(type, id, options={})
@@ -135,6 +137,8 @@ module Monger
       end
 
       def doc_to_entity(type, mongo_doc, options={})
+        return nil if mongo_doc.nil?
+        
         depth = options[:depth] || 1
         ignore = options[:ignore] || []
         force = options[:force] || []
