@@ -138,6 +138,9 @@ module Monger
 
       def doc_to_entity(type, mongo_doc, options={})
         return nil if mongo_doc.nil?
+
+        # We never want a limit when mapping
+        options.delete(:limit)
         
         depth = options[:depth] || 1
         ignore = options[:ignore] || []

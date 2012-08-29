@@ -155,14 +155,31 @@ describe Monger::Mongo::Mapper do
       comment.important.should be_nil
     end
 
-    it "supports limits" do
-      comments = subject.find(:comment, {}, :limit => 1)
-      comments.should have_exactly(1).items
-    end
+    context "when dealing with limits and finding a single entity" do
+      it "supports limits" do
+        comments = subject.find(:comment, {}, :limit => 1)
+        comments.should have_exactly(1).items
+      end
 
-    it "can handle bad limits" do
-      comments = subject.find(:comment, {}, :limit => 'not really a limit')
-      comments.should have_exactly(2).items
+      it "can handle bad limits" do
+        comments = subject.find(:comment, {}, :limit => 'not really a limit')
+        comments.should have_exactly(2).items
+      end
+
+      it "loads full inverse collections when a limit is specified" do
+        user = subject.find(:user, {:name => 'Jane Smith'}, :limit => 1).first
+        user.likes.should have_exactly(2).items
+      end
+
+      it "returns the first entity instance when using find_one" do
+        post = subject.find_one(:blog_post,{})
+        post.should be_is_a(Domain::BlogPost)
+      end
+
+      it "loads full inverse collections when using find_one" do
+        user = subject.find_one(:user, {:name => 'Jane Smith'})
+        user.likes.should have_exactly(2).items
+      end
     end
   end
 

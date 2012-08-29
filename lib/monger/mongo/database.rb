@@ -14,10 +14,11 @@ module Monger
         puts "Mongo Find: #{type.inspect} #{criteria.inspect}" if @config.verbose?
  
         mongo_options = {}
+        cursor = @db[type.to_s].find(criteria, mongo_options)
         unless options[:limit].nil? || !options[:limit].is_a?(Fixnum)
-          mongo_options[:limit] = options[:limit]
+          cursor.limit(options[:limit])
         end
-        @db[type.to_s].find(criteria, mongo_options)
+        return cursor
       end
 
       def insert(type, doc, options={})
