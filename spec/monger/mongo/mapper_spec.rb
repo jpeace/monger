@@ -312,6 +312,9 @@ describe Monger::Mongo::Mapper do
         end
       end
       post.add_tag('tag1')
+      post.tags[0].meta = Domain::TagMeta.new do |m|
+        m.data = 'metadata'
+      end
       post.add_tag('tag2')
 
       subject.save(post, :atomic => true)
@@ -319,7 +322,24 @@ describe Monger::Mongo::Mapper do
       doc = find_in_db(:blog_post, post.monger_id)
       doc['related_links']['urls'].should eq ['http://www.google.com']
       doc['tags'][0]['name'].should eq 'tag1'
+      doc['tags'][0]['meta']['data'].should eq 'metadata'
       doc['tags'][1]['name'].should eq 'tag2'
+    end
+
+    it "updates inline properties" do
+      post = Domain::BlogPost.new
+      post.add_tag('tag1')
+      post.tags[0].meta = Domain::TagMeta.new do |m|
+        m.data = 'metadata'
+      end
+      subject.save(post, :atomic => true)
+      post.tags[0].name = 'changed'
+      post.tags[0].meta.data = 'new metadata'
+      subject.save(post, :atomic => true)
+
+      doc = find_in_db(:blog_post, post.monger_id)
+      doc['tags'][0]['name'].should eq 'changed'
+      doc['tags'][0]['meta']['data'].should eq 'new metadata'
     end
 
     it "writes inverse collections" do

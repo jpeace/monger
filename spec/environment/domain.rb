@@ -1,6 +1,13 @@
 module Domain
   class Tag
-    attr_accessor :name
+    attr_accessor :name, :meta
+    def initialize
+      yield self if block_given?
+    end
+  end
+
+  class TagMeta
+    attr_accessor :data
     def initialize
       yield self if block_given?
     end
