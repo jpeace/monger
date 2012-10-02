@@ -51,6 +51,7 @@ module Monger
 
       def save(entity, options={})
         inline = options[:inline] || false
+        skip_hooks = options[:skip_hooks] || false
 
         type = entity.class.build_symbol
 
@@ -77,23 +78,23 @@ module Monger
             doc[name.to_s] = {'hour' => value.hour, 'minute' => value.minute, 'second' => value.second}
           when :reference
             if prop.inline?
-              doc[name.to_s] = save(value, :inline => true)
+              doc[name.to_s] = save(value, :inline => true, :skip_hooks => skip_hooks)
             else
-              save(value) if value.monger_id.nil? || prop.update?
+              save(value, :skip_hooks => skip_hooks) if value.monger_id.nil? || prop.update?
               doc["#{name}_id"] = value.monger_id
             end
           when :collection
             value.each do |el|
               if prop.inline?
                 doc[name.to_s] ||= []
-                doc[name.to_s] << save(el, :inline => true)
+                doc[name.to_s] << save(el, :inline => true, :skip_hooks => skip_hooks)
               elsif prop.inverse?
                 doc[name.to_s] ||= []
-                save(el) if el.monger_id.nil?
+                save(el, :skip_hooks => skip_hooks) if el.monger_id.nil?
                 doc[name.to_s] << el.monger_id if el.respond_to? :monger_id
               else
                 if el.monger_id.nil? || prop.update?
-                  save(el, :extra => {"#{prop.ref_name}_id" => entity.monger_id})
+                  save(el, :extra => {"#{prop.ref_name}_id" => entity.monger_id}, :skip_hooks => skip_hooks)
                 end
               end
             end
