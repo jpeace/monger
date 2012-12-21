@@ -28,7 +28,11 @@ module Monger
       end
 
       def modules(*modules)
-        @config.modules = modules
+        @config.add_modules(modules)
+      end
+
+      def import_configuration(config)
+        @config.add_external_config(config)
       end
 
       def map(type)

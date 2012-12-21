@@ -6,8 +6,8 @@ end
 
 module Monger
   class Configuration
-    attr_accessor :host, :port, :database, :js_namespace, :modules, :debug
-    attr_reader :mongo_hooks, :maps
+    attr_accessor :host, :port, :database, :js_namespace, :debug
+    attr_reader :modules, :mongo_hooks, :maps
 
     def self.from_file(path)
       File.open(path, 'r') do |file|
@@ -16,6 +16,8 @@ module Monger
     end
 
     def initialize(script='')
+      @modules = []
+      @external_configs = []
       @mongo_hooks = {
         :before_read => [],
         :before_write => []
@@ -27,6 +29,20 @@ module Monger
 
     def verbose?
       @debug
+    end
+
+    def add_modules(mods)
+      @modules += mods
+    end
+
+    def add_external_config(config)
+      config.modules.each do |mod|
+        @modules << mod unless @modules.include?(mod)
+      end
+      @mongo_hooks.keys.each do |k|
+        @mongo_hooks[k] += config.mongo_hooks[k] unless config.mongo_hooks[k].nil?
+      end
+      @maps.merge!(config.maps)
     end
 
     def hook_mongo(hook, &block)
