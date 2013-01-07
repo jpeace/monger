@@ -22,7 +22,7 @@ module Domain
   end
 
   class BlogPost
-    attr_accessor :title, :author, :date, :time, :body, :comments, :tags, :related_links
+    attr_accessor :title, :author, :coauthor, :date, :time, :body, :shares, :comments, :tags, :related_links
     def initialize
       @tags = []
       yield self if block_given?
@@ -42,7 +42,7 @@ module Domain
 
   module Auth
     class User
-      attr_accessor :name, :age, :gender, :posts, :likes, :comments
+      attr_accessor :name, :age, :gender, :posts, :co_posts, :likes, :comments
       def initialize
         yield self if block_given?
       end

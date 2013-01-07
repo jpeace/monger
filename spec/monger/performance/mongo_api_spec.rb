@@ -1,7 +1,7 @@
 db = Monger::Mongo::Database
 
-describe Monger::Mongo::Mapper do
-  subject {described_class.new(Mocks::real_config)}
+describe Monger::Mongo::Api do
+  subject {described_class.new(Mocks::real_config, db)}
 
   def setup_tag
     t = Domain::Tag.new {|t| t.name = 'TEST TAG'}

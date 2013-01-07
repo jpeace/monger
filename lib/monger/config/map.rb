@@ -1,10 +1,16 @@
 module Monger
   module Config
     class Map
-      attr_reader :properties
+
+      attr_reader :entity_class, :properties
       
-      def initialize
+      def initialize(entity_class)
+        @entity_class = entity_class
         @properties = {}
+      end
+
+      def build_entity
+        @entity_class.new
       end
 
       def direct_properties
@@ -29,8 +35,7 @@ module Monger
         inline = options[:inline] || false
         delete = options[:delete] || false
         inverse = options[:inverse] || false
-        always_read = options[:always_read] || false
-        read_by_default = options[:read_by_default].nil? ? true : options[:read_by_default]
+        load_type = options[:load_type] || :lazy
         @properties[name] = Property.new do |p|
           p.name = name
           p.mode = mode
@@ -40,8 +45,7 @@ module Monger
           p.inline = inline
           p.delete = delete
           p.inverse = inverse
-          p.always_read = always_read
-          p.read_by_default = read_by_default
+          p.load_type = load_type
         end
       end
     end
