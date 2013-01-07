@@ -32,7 +32,7 @@ describe Monger::Json::Mapper do
 
   json = %{
     {
-      "id":"#{Database::blog_post_id}",
+      "id":"#{Database::blog_post_id.to_s}",
       "title":"Title",
       "body":"Body",
       "date":"5/16/2012",
@@ -116,10 +116,10 @@ describe Monger::Json::Mapper do
     end
 
     it "works with monger ids" do
-      post.monger_id = Database::blog_post_id.to_monger_id
+      post.monger_id = Database::blog_post_id
       hash = subject.get_hash(post)
 
-      hash['id'].should eq Database::blog_post_id
+      hash['id'].should eq Database::blog_post_id.to_s
     end
   end
 
@@ -169,7 +169,7 @@ describe Monger::Json::Mapper do
       obj = subject.from_hash(:blog_post, hash)
 
       obj.related_links.should be_is_a Domain::Related
-      obj.related_links.urls.should eq ['http://www.google.com']
+      obj.related_links.urls.should eq %w(http://www.google.com)
     end
 
     it "works with inline collections" do
@@ -184,7 +184,7 @@ describe Monger::Json::Mapper do
     it "works with monger ids" do
       obj = subject.from_hash(:blog_post, hash)
       obj.monger_id.should be_is_a BSON::ObjectId
-      obj.monger_id.to_s.should eq Database::blog_post_id
+      obj.monger_id.to_s.should eq Database::blog_post_id.to_s
     end
 
     it "handles empty ids" do

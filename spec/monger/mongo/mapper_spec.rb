@@ -8,8 +8,9 @@ describe Monger::Mongo::Mapper do
 
     before(:each) do
       real_config = Mocks.real_config
-      blog_post_doc = find_in_db(:blog_post, Database::blog_post_id.to_monger_id)
-      user_doc = find_in_db(:user, Database::user_id.to_monger_id)
+      blog_post_doc = find_in_db(:blog_post, Database::blog_post_id)
+      user_doc = find_in_db(:user, Database::user_id)
+      user_doc['co_posts'] = Database::db['blog_post'].find({ :coauthor_id => Database::user_id }).map {|post| post.monger_id}
       @blog_post = subject.doc_to_entity(real_config.maps[:blog_post], blog_post_doc)
       @user = subject.doc_to_entity(real_config.maps[:user], user_doc)
     end
@@ -53,7 +54,7 @@ describe Monger::Mongo::Mapper do
     end
 
     it "can map inverse collections set to be eager loaded" do
-      @blog_post.shares.class.should eq Monger::Mongo::Placeholders::EagerCollectionPlaceholder
+      @blog_post.shares.class.should eq Monger::Mongo::Placeholders::EagerInverseCollectionPlaceholder
       @blog_post.shares[0].name.should eq "Jane Smith"
       @blog_post.shares.class.should eq Array
       @blog_post.shares[0].class.should eq Domain::Auth::User
@@ -67,14 +68,14 @@ describe Monger::Mongo::Mapper do
       @user.likes[1].class.should eq Monger::Mongo::Placeholders::LazyCollectionPlaceholder
     end
 
-    it "can map non-inverse collections set to be eager loaded" do
-      @user.comments.class.should eq Monger::Mongo::Placeholders::EagerCollectionPlaceholder
+    it "can map mapped collections set to be eager loaded" do
+      @user.comments.class.should eq Monger::Mongo::Placeholders::EagerMappedCollectionPlaceholder
       @user.comments[0].message.should eq "A comment"
       @user.comments.class.should eq Array
       @user.comments[0].class.should eq Domain::Comment
     end
 
-    it "can map non-inverse collections set to be lazy loaded" do
+    it "can map mapped collections set to be lazy loaded" do
       @user.co_posts.class.should eq Array
       @user.co_posts[0].class.should eq Monger::Mongo::Placeholders::LazyCollectionPlaceholder
       @user.co_posts[0].title.should eq "Blog Post"

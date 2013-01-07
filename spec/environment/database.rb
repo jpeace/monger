@@ -3,11 +3,11 @@ require 'ostruct'
 
 module Database
   def self.blog_post_id
-    @@blog_post_id ||= BSON::ObjectId.new.to_s
+    "50eb07a1d2648703c3000006".to_monger_id
   end
 
   def self.user_id
-    @@user_id ||= BSON::ObjectId.new.to_s
+    "50eb07a1d2648703c3000003".to_monger_id
   end
 
   def self.db
@@ -28,22 +28,22 @@ module Database
   post2 = Database::db['blog_post'].find({:title => 'Post2'}).first
 
   user1 = { :name => 'John Doe', :age => 42, :gender => 'Male'}
-  user2 = { :_id => Database::user_id.to_monger_id, :name => 'Jane Smith', :age => 37, :gender => 'Female', :likes => [post1['_id'], post2['_id']]}
+  user2 = { :_id => Database::user_id, :name => 'Jane Smith', :age => 37, :gender => 'Female', :likes => [post1['_id'], post2['_id']]}
   user3 = { :name => 'Jane Doe', :age => 14, :gender => 'Female' }
   Database::db['user'].insert(user1)
   Database::db['user'].insert(user2)
   Database::db['user'].insert(user3)
 
   post = {
-    :_id => Database::blog_post_id.to_monger_id,
+    :_id => Database::blog_post_id,
     :title => 'Blog Post',
     :author_id => user1.monger_id,
-    :coauthor_id => user_id.to_monger_id,
+    :coauthor_id => Database::user_id,
     :body => 'Here is a post',
     :date => Time.utc(2012, 5, 16),
     :time => { :hour => 21, :minute => 30, :second => 0},
     :shares => [
-      user_id.to_monger_id,
+      Database::user_id,
       user3.monger_id
     ],
     :tags => [

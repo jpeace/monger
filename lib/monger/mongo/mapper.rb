@@ -18,26 +18,27 @@ module Monger
 
         map.properties.each do |name, prop|
           entity.set_property(name, []) if prop.mode == :collection    # Default for collections in case we don't end up mapping
-          prop_value = doc[name.to_s]
 
           case prop.mode
             when :direct, :date
-              entity.set_property(name, prop_value) if doc.has_key?(name.to_s)
+              entity.set_property(name, doc[name.to_s]) if doc.has_key?(name.to_s)
 
             when :time
-              entity.set_property(name, ::TimeOfDay.new(prop_value['hour'], prop_value['minute'], prop_value['second'])) unless prop_value.nil?
+              time_obj = doc[name.to_s]
+              entity.set_property(name, ::TimeOfDay.new(time_obj['hour'], time_obj['minute'], time_obj['second'])) unless time_obj.nil?
 
             when :reference
               reference_entity = nil
 
               if prop.inline?
-                reference_entity = doc_to_entity(@api.config.maps[prop.type], prop_value, options) unless prop_value.nil?
+                reference_doc = doc[name.to_s]
+                reference_entity = doc_to_entity(@api.config.maps[prop.type], reference_doc, options) unless reference_doc.nil?
               else
-                ref_id = doc["#{name}_id"]
+                reference_id = doc["#{name}_id"]
                 if prop.eager?
-                  reference_entity = @api.find_by_id(prop.type, prop_value, options) unless ref_id.nil?
+                  reference_entity = @api.find_by_id(prop.type, reference_id, options) unless reference_id.nil?
                 else
-                  reference_entity = Placeholders::LazyReferencePlaceholder.new(@api, prop.type, entity, name, ref_id) unless ref_id.nil?
+                  reference_entity = Placeholders::LazyReferencePlaceholder.new(@api, entity, prop, reference_id) unless reference_id.nil?
                 end
               end
 
@@ -47,18 +48,21 @@ module Monger
               collection = []
 
               if prop.inline?
-                collection = docs_to_entities(@api.config.maps[prop.type], prop_value, options)
+                reference_docs = doc[name.to_s]
+                collection = docs_to_entities(@api.config.maps[prop.type], reference_docs, options)
               else
-                unless prop.inverse?
-                  puts "#{prop.type}, #{prop.ref_name}_id, #{doc.monger_id.to_s}"
-                  prop_value = @api.find(prop.type, { "#{prop.ref_name}_id" => doc.monger_id }, options)
-                  puts prop_value
-                end
-
                 if prop.eager?
-                  collection = Placeholders::EagerCollectionPlaceholder.new(@api, prop.type, entity, name, prop_value)
+                  if prop.inverse?
+                    reference_ids = doc[name.to_s]
+                    collection = Placeholders::EagerInverseCollectionPlaceholder.new(@api, entity, prop, reference_ids)
+                  else
+                    collection = Placeholders::EagerMappedCollectionPlaceholder.new(@api, entity, prop)
+                  end
                 else
-                  collection = prop_value.each_with_index.map{|id, index| Placeholders::LazyCollectionPlaceholder.new(@api, prop.type, entity, name, index, id)} if prop_value.class == Array
+                  # in the case of a lazy loaded mapped collection, the reference_ids must be
+                  # populated in the api call - this prevents needing database access inside the mapper
+                  reference_ids = doc[name.to_s]
+                  collection = reference_ids.each_with_index.map{|id, index| Placeholders::LazyCollectionPlaceholder.new(@api, entity, prop, index, id)} if reference_ids.class == Array
                 end
               end
 

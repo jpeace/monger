@@ -50,6 +50,10 @@ module Monger
         @db[type.to_s].remove(criteria)
         @db.get_last_error if options[:atomic]
       end
+
+      def query
+        @db
+      end
     end
   end
 end
