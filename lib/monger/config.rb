@@ -68,6 +68,7 @@ module Monger
       raise ArgumentError
     end
 
+    # to be deprecated
     def build_object_of_type(type)
       find_class(type).new
     end  

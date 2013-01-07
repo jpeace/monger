@@ -1,8 +1,8 @@
 module Monger
   module Config
     class Property
-      attr_accessor :name, :mode, :klass
-      attr_accessor :ref_name, :update, :inline, :delete, :inverse, :always_read, :read_by_default
+      attr_accessor :name, :mode, :map, :klass
+      attr_accessor :ref_name, :update, :inline, :delete, :inverse, :load_type
 
       def initialize
         yield self if block_given?
@@ -24,12 +24,12 @@ module Monger
         @inverse
       end
 
-      def always_read?
-        @always_read
+      def eager?
+        @load_type == :eager
       end
 
-      def read_by_default?
-        @read_by_default
+      def lazy?
+        @load_type == :lazy
       end
 
       def type

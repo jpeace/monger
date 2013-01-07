@@ -8,7 +8,7 @@ module Monger
       def initialize(config, type)
         @config = config
         @type = type
-        @map = Monger::Config::Map.new
+        @map = Monger::Config::Map.new(config.find_class(type))
       end
 
       def properties(*names)
@@ -27,13 +27,17 @@ module Monger
 
       def has_a(name, options={})
         raise ArgumentError if options[:type].nil?
-        klass = @config.find_class(options[:type])
+        type = options[:type]
+        #map = @config.maps[type] this won't work yet because not all maps necessarily exist at the time of building this one
+        klass = @config.find_class(type)
         @map.add_property(name, klass, :reference, options)
       end
 
       def has_many(name, options={})
         raise ArgumentError if options[:type].nil?
-        klass = @config.find_class(options[:type])
+        type = options[:type]
+        #map = @config.maps[type]
+        klass = @config.find_class(type)
         options[:ref_name] ||= @type
         @map.add_property(name, klass, :collection, options)
       end
