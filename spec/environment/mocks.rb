@@ -30,6 +30,8 @@ module Mocks
           [ Domain::Auth::User.new {|u| u.name = "Jane Smith"} ]
         when :comment
           [ Domain::Comment.new {|c| c.message = "A comment"} ]
+        when :blog_post
+          [ Domain::BlogPost.new {|bp| bp.title = "Blog Post"} ]
       end
     end
 
@@ -38,7 +40,7 @@ module Mocks
         when :user
           Domain::Auth::User.new {|u| u.name = "John Doe"}
         when :blog_post
-          Domain::BlogPost.new {|bp| bp.title = "Post1"}
+          id.to_s == "50eb07a1d2648703c3000006" ? Domain::BlogPost.new {|bp| bp.title = "Blog Post"} : Domain::BlogPost.new {|bp| bp.title = "Post1"}
       end
     end
   end

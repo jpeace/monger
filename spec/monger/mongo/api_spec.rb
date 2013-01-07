@@ -14,13 +14,18 @@ describe ::Monger::Mongo::Api do
   end
 
   context "when reading" do
+
+    before(:each) do
+      @blog_post_id_string = Database.blog_post_id.to_s
+    end
+
     it "finds entities by id" do
-      post = subject.find_by_id(:blog_post, Database::blog_post_id)
+      post = subject.find_by_id(:blog_post, @blog_post_id_string)
       post.title.should eq 'Blog Post'
     end
 
     it "works with monger ids, too" do
-      post = subject.find_by_id(:blog_post, Database::blog_post_id.to_monger_id)
+      post = subject.find_by_id(:blog_post, Database::blog_post_id)
       post.title.should eq 'Blog Post'
     end
 
@@ -30,28 +35,28 @@ describe ::Monger::Mongo::Api do
     end
 
     it "adds a monger id" do
-      post = subject.find_by_id(:blog_post, Database::blog_post_id)
-      post.monger_id.should eq Database::blog_post_id.to_monger_id
+      post = subject.find_by_id(:blog_post, @blog_post_id_string)
+      post.monger_id.should eq Database::blog_post_id
     end
 
     it "reads direct properties" do
-      post = subject.find_by_id(:blog_post, Database::blog_post_id)
+      post = subject.find_by_id(:blog_post, @blog_post_id_string)
       post.title.should eq 'Blog Post'
       post.body.should eq 'Here is a post'
     end
 
     it "reads date properties" do
-      post = subject.find_by_id(:blog_post, Database::blog_post_id)
+      post = subject.find_by_id(:blog_post, @blog_post_id_string)
       post.date.should eq Time.utc(2012, 5, 16)
     end
 
     it "reads time properties" do
-      post = subject.find_by_id(:blog_post, Database::blog_post_id)
+      post = subject.find_by_id(:blog_post, @blog_post_id_string)
       post.time.to_12_hour.should eq '9:30 PM'
     end
 
     it "reads reference properties" do
-      post = subject.find_by_id(:blog_post, Database::blog_post_id)
+      post = subject.find_by_id(:blog_post, @blog_post_id_string)
       post.author.should be_is_a Domain::Auth::User
       post.author.name.should eq 'John Doe'
       post.author.age.should eq 42
@@ -59,7 +64,7 @@ describe ::Monger::Mongo::Api do
     end
 
     it "reads collection properties" do
-      post = subject.find_by_id(:blog_post, Database::blog_post_id)
+      post = subject.find_by_id(:blog_post, @blog_post_id_string)
       post.comments.should have_exactly(2).items
       post.comments.each do |c|
         ['A comment', 'Another comment'].should include(c.message)
@@ -94,55 +99,13 @@ describe ::Monger::Mongo::Api do
       user.likes[0].title.should eq('Post2')
     end
 
-    it "reads to a given depth" do
-      post = subject.find_by_id(:blog_post, Database::blog_post_id, :depth => 2)
-      post.author.posts.first.title.should eq 'Blog Post'
-      post.author.posts.first.comments.should be_empty
-    end
-
     it "reads inline properties" do
-      post = subject.find_by_id(:blog_post, Database::blog_post_id)
+      post = subject.find_by_id(:blog_post, @blog_post_id_string)
       post.related_links.urls.should eq ['http://www.google.com']
       post.tags.should have_exactly(2).items
       post.tags.each do |t|
         ['tag1','tag2'].should include(t.name)
       end
-    end
-
-    it "ignores depth for inline properties" do
-      post = subject.find_by_id(:blog_post, Database::blog_post_id, :depth => 0)
-      post.comments.should be_empty
-      post.related_links.urls.should eq ['http://www.google.com']
-      post.tags.should have_exactly(2).items
-    end
-
-    it "can be configured to always read certain properties" do
-      post = subject.find_by_id(:blog_post, Database::blog_post_id, :depth => 0)
-      post.comments.should be_empty
-      post.author.should_not be_nil
-    end
-
-    it "can be configured to not read certain properties by default" do
-      post = subject.find_by_id(:blog_post, Database::blog_post_id, :depth => 2)
-      post.author.comments.should be_empty
-    end
-
-    it "can be configured to force certain properties to be read" do
-      post = subject.find_by_id(:blog_post, Database::blog_post_id, :depth => 2, :force => [:comments])
-      post.author.comments.should have_exactly(1).items
-
-      post = subject.find_by_id(:blog_post, Database::blog_post_id, :depth => 0, :force => [:comments])
-      post.comments.should have_exactly(2).items
-      post.comments.each do |c|
-        ['A comment', 'Another comment'].should include(c.message)
-      end
-    end
-
-    it "can be configured to ignore certain mappings" do
-      post = subject.find_by_id(:blog_post, Database::blog_post_id, :ignore => [:tags, :author, :urls])
-      post.author.should be_nil
-      post.tags.should be_empty
-      post.related_links.urls.should be_empty
     end
 
     it "doesn't map properties when they don't exist in the document" do
