@@ -3,6 +3,10 @@ module Monger
     module Placeholders
       class LazyCollectionPlaceholder
 
+        def monger_id
+          @id
+        end
+
         def initialize(api, parent, prop, index, id)
           @api = api
           @parent = parent

@@ -3,6 +3,10 @@ module Monger
     module Placeholders
       class LazyReferencePlaceholder
 
+        def monger_id
+          @id
+        end
+
         def initialize(api, parent, prop, id)
           @api = api
           @id = id

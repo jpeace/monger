@@ -19,17 +19,17 @@ module Database
     Database::db[coll].drop
   end
 
-  post1 = {:title => 'Post1'}
-  post2 = {:title => 'Post2'}
+  post1 = {:_id => "50eb46cad264870783000001".to_monger_id, :title => 'Post1'}
+  post2 = {:_id => "50eb46cad264870783000002".to_monger_id, :title => 'Post2'}
   Database::db['blog_post'].insert(post1)
   Database::db['blog_post'].insert(post2)
 
   post1 = Database::db['blog_post'].find({:title => 'Post1'}).first
   post2 = Database::db['blog_post'].find({:title => 'Post2'}).first
 
-  user1 = { :name => 'John Doe', :age => 42, :gender => 'Male'}
-  user2 = { :_id => Database::user_id, :name => 'Jane Smith', :age => 37, :gender => 'Female', :likes => [post1['_id'], post2['_id']]}
-  user3 = { :name => 'Jane Doe', :age => 14, :gender => 'Female' }
+  user1 = { :_id => "50eb46cad264870783000003".to_monger_id, :name => 'John Doe',   :age => 42, :gender => 'Male'}
+  user2 = { :_id => Database::user_id,                       :name => 'Jane Smith', :age => 37, :gender => 'Female', :likes => [post1['_id'], post2['_id']]}
+  user3 = { :_id => "50eb46cad264870783000004".to_monger_id, :name => 'Jane Doe',   :age => 14, :gender => 'Female' }
   Database::db['user'].insert(user1)
   Database::db['user'].insert(user2)
   Database::db['user'].insert(user3)
@@ -56,8 +56,8 @@ module Database
   }
   Database::db['blog_post'].insert(post)
 
-  comment1 = {:user_id => user1.monger_id, :message => 'A comment', :blog_post_id => post.monger_id}
-  comment2 = {:user_id => user2.monger_id, :message => 'Another comment', :blog_post_id => post.monger_id, :important => nil}
+  comment1 = {:_id => "50eb46cad264870783000005".to_monger_id, :user_id => user1.monger_id, :message => 'A comment', :blog_post_id => post.monger_id}
+  comment2 = {:_id => "50eb46cad264870783000006".to_monger_id, :user_id => user2.monger_id, :message => 'Another comment', :blog_post_id => post.monger_id, :important => nil}
   Database::db['comment'].insert(comment1)
   Database::db['comment'].insert(comment2)
 

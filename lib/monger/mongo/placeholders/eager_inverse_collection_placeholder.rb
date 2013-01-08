@@ -3,6 +3,8 @@ module Monger
     module Placeholders
       class EagerInverseCollectionPlaceholder
 
+        attr_reader :ids
+
         def initialize(api, parent, prop, ids)
           @api = api
           @ids = ids
