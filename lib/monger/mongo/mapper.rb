@@ -83,24 +83,31 @@ module Monger
         collection
       end
 
-      def entity_to_doc(map, entity)
-        inline = options[:inline] || false
-        skip_hooks = options[:skip_hooks] || false
+      def entity_to_docs(map, entity)
+        docs = []
+        docs << entity_to_doc(map, entity)
 
-        type = entity.class.build_symbol
+        map.reference_properties.each do |name, prop|
+          reference = entity.get_property(name)
+          docs << entity_to_docs(prop.type, reference) unless is_placeholder?(reference)
+        end
 
-        doc = {}
-
-        if !inline
-          if entity.monger_id.nil?
-            @db.insert(type, doc, options)
-            entity.monger_id = doc.monger_id
-          else
-            doc.monger_id = entity.monger_id
+        map.collection_properties.each do |name, prop|
+          reference_list = entity.get_property(name)
+          unless is_placeholder?(reference_list)
+            reference_list.each do |reference|
+              docs << entity_to_docs(prop.type, reference) unless is_placeholder?(reference)
+            end
           end
         end
 
-        map = @config.maps[type]
+        docs
+      end
+
+      def entity_to_doc(map, entity, options={})
+        doc = {}
+
+        doc.monger_id = entity.monger_id if options[:inline].nil?
         map.properties.each do |name, prop|
           value = entity.get_property(name)
           next if value.nil?
@@ -108,42 +115,38 @@ module Monger
           case prop.mode
             when :direct, :date
               doc[name.to_s] = value
+
             when :time
-              doc[name.to_s] = {'hour' => value.hour, 'minute' => value.minute, 'second' => value.second}
+              doc[name.to_s] = { "hour" => value.hour, "minute" => value.minute, "second" => value.second }
+
             when :reference
               if prop.inline?
-                doc[name.to_s] = save(value, :inline => true, :skip_hooks => skip_hooks)
+                doc[name.to_s] = entity_to_doc(@api.config.maps[prop.type], value, { :inline => true })
               else
-                save(value, :skip_hooks => skip_hooks) if value.monger_id.nil? || prop.update?
-                doc["#{name}_id"] = value.monger_id
+                doc["#{name.to_s}_id"] = value.monger_id
               end
+
             when :collection
-              value.each do |el|
-                if prop.inline?
-                  doc[name.to_s] ||= []
-                  doc[name.to_s] << save(el, :inline => true, :skip_hooks => skip_hooks)
-                elsif prop.inverse?
-                  doc[name.to_s] ||= []
-                  save(el, :skip_hooks => skip_hooks) if el.monger_id.nil?
-                  doc[name.to_s] << el.monger_id if el.respond_to? :monger_id
-                else
-                  if el.monger_id.nil? || prop.update?
-                    save(el, :extra => {"#{prop.ref_name}_id" => entity.monger_id}, :skip_hooks => skip_hooks)
-                  end
-                end
+              if prop.inline?
+                collection_entity_map = @api.config.maps[prop.type]
+                doc[name.to_s] = value.map {|collection_entity| entity_to_doc(collection_entity_map, collection_entity, { :inline => true })}
+              elsif prop.inverse?
+                doc[name.to_s] = is_placeholder?(value) ? value.ids : value.map {|collection_entity| collection_entity.monger_id}
               end
           end
         end
 
-        extra = options[:extra] || {}
-        extra.each do |k,v|
-          doc[k] = v
-        end
-
-        @db.update(type, doc, options) unless inline
-        return doc
+        doc
       end
 
+      def is_placeholder?(entity)
+        [
+          Placeholders::LazyReferencePlaceholder,
+          Placeholders::LazyCollectionPlaceholder,
+          Placeholders::EagerInverseCollectionPlaceholder,
+          Placeholders::EagerMappedCollectionPlaceholder
+        ].include?(entity.class)
+      end
     end  
   end
 end
