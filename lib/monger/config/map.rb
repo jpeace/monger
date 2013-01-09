@@ -29,6 +29,14 @@ module Monger
         @properties.select{|n,p| p.mode == :collection}
       end
 
+      def inverse_collection_properties
+        collection_properties.select{|n,p| p.inverse?}
+      end
+
+      def mapped_collection_properties
+        collection_properties.select{|n,p| not p.inverse?}
+      end
+
       def add_property(name, klass=nil, mode=:direct, options={})
         ref_name = options[:ref_name] || nil
         update = options[:update] || false

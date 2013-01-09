@@ -59,10 +59,14 @@ module Monger
                     collection = Placeholders::EagerMappedCollectionPlaceholder.new(@api, entity, prop)
                   end
                 else
-                  # in the case of a lazy loaded mapped collection, the reference_ids must be
-                  # populated in the api call - this prevents needing database access inside the mapper
-                  reference_ids = doc[name.to_s]
-                  collection = reference_ids.each_with_index.map{|id, index| Placeholders::LazyCollectionPlaceholder.new(@api, entity, prop, index, id)} if reference_ids.class == Array
+                  if prop.inverse?
+                    reference_ids = doc[name.to_s]
+                    collection = reference_ids.each_with_index.map{|id, index| Placeholders::LazyCollectionReferencePlaceholder.new(@api, entity, prop, index, id)} if reference_ids.class == Array
+                  else
+                    # for a lazy loaded mapped collection, the doc[name.to_s] is a cursor prebuilt in the api request
+                    cursor = doc[name.to_s]
+                    collection = Placeholders::LazyMappedCollectionPlaceholder.new(@api, entity, prop, cursor)
+                  end
                 end
               end
 
@@ -84,19 +88,22 @@ module Monger
       end
 
       def entity_to_docs(map, entity)
-        docs = []
-        docs << entity_to_doc(map, entity)
+        type = entity.class.build_symbol
+        docs = {}
+        docs[type] = [ entity_to_doc(map, entity) ]
 
         map.reference_properties.each do |name, prop|
+          docs[prop.type] = [ ] if docs[prop.type].nil?
           reference = entity.get_property(name)
-          docs << entity_to_docs(prop.type, reference) unless is_placeholder?(reference)
+          docs[prop.type] << entity_to_docs(@api.config.maps[prop.type], reference) unless is_placeholder?(reference)
         end
 
         map.collection_properties.each do |name, prop|
+          docs[prop.type] = [ ] if docs[prop.type].nil?
           reference_list = entity.get_property(name)
           unless is_placeholder?(reference_list)
             reference_list.each do |reference|
-              docs << entity_to_docs(prop.type, reference) unless is_placeholder?(reference)
+              docs[prop.type] << entity_to_docs(@api.config.maps[prop.type], reference) unless is_placeholder?(reference)
             end
           end
         end
@@ -117,7 +124,7 @@ module Monger
               doc[name.to_s] = value
 
             when :time
-              doc[name.to_s] = { "hour" => value.hour, "minute" => value.minute, "second" => value.second }
+              doc[name.to_s] = { 'hour' => value.hour, 'minute' => value.minute, 'second' => value.second }
 
             when :reference
               if prop.inline?

@@ -1,3 +1,5 @@
+require "../../spec_helper"
+
 include Database
 
 describe ::Monger::Mongo::Api do
@@ -5,11 +7,11 @@ describe ::Monger::Mongo::Api do
 
   context "when searching" do
     it "builds search criteria" do
-      subject.build_search_criteria(:blog_post, 'term').should eq ({'$or' => [{ :title => /term/i}, { :body => /term/i}]})
+      subject.build_search_criteria(:blog_post, 'term').should eq ({'$or' => [{ "title" => /term/i}, { "body" => /term/i}]})
     end
 
     it "can build a search criteria for the specified fields" do
-      subject.build_search_criteria(:blog_post, 'term', [:title]).should eq ({'$or' => [{ :title => /term/i}]})
+      subject.build_search_criteria(:blog_post, 'term', [:title]).should eq ({'$or' => [{ "title" => /term/i}]})
     end
   end
 
@@ -57,7 +59,7 @@ describe ::Monger::Mongo::Api do
 
     it "reads reference properties" do
       post = subject.find_by_id(:blog_post, @blog_post_id_string)
-      post.author.should be_is_a Domain::Auth::User
+      post.author.should be_a Domain::Auth::User
       post.author.name.should eq 'John Doe'
       post.author.age.should eq 42
       post.author.gender.should eq 'Male'
@@ -65,7 +67,7 @@ describe ::Monger::Mongo::Api do
 
     it "reads collection properties" do
       post = subject.find_by_id(:blog_post, @blog_post_id_string)
-      post.comments.should have_exactly(2).items
+      post.comments.length.should eq 2
       post.comments.each do |c|
         ['A comment', 'Another comment'].should include(c.message)
       end
@@ -119,6 +121,13 @@ describe ::Monger::Mongo::Api do
     end
 
     context "when dealing with limits and finding a single entity" do
+
+      it "can use find_one() to replace find(...).first" do
+        user1 = subject.find(:user, {:name => 'Jane Smith'}).first
+        user2 = subject.find_one(:user, {:name => 'Jane Smith'})
+        user1.should eq user2
+      end
+
       it "supports limits" do
         comments = subject.find(:comment, {}, :limit => 1)
         comments.should have_exactly(1).items

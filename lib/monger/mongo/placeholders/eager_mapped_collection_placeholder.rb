@@ -1,6 +1,7 @@
 module Monger
   module Mongo
     module Placeholders
+      # this class eager loads all references of a mapped collection on access
       class EagerMappedCollectionPlaceholder
 
         def initialize(api, parent, prop)
@@ -11,12 +12,8 @@ module Monger
 
         def method_missing(method, *args, &block)
           entity_list = @api.find(@prop.type, { "#{@prop.ref_name}_id" => @parent.monger_id })
-          @parent.send("#{@prop.name}=", entity_list )
-          args.empty? ? parent_property.send(method, &block) : parent_property.send(method, *args, &block)
-        end
-
-        def parent_property
-          @parent.method(@prop.name).call
+          @parent.set_property(@prop.name, entity_list)
+          args.empty? ? @parent.get_property(@prop.name).send(method, &block) : @parent.get_property(@prop.name).send(method, *args, &block)
         end
 
       end
