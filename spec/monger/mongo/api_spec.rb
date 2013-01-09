@@ -103,10 +103,10 @@ describe ::Monger::Mongo::Api do
 
     it "reads inline properties" do
       post = subject.find_by_id(:blog_post, @blog_post_id_string)
-      post.related_links.urls.should eq ['http://www.google.com']
+      post.related_links.urls.should eq %w(http://www.google.com)
       post.tags.should have_exactly(2).items
       post.tags.each do |t|
-        ['tag1','tag2'].should include(t.name)
+        %w(tag1 tag2).should include(t.name)
       end
     end
 
@@ -125,7 +125,7 @@ describe ::Monger::Mongo::Api do
       it "can use find_one() to replace find(...).first" do
         user1 = subject.find(:user, {:name => 'Jane Smith'}).first
         user2 = subject.find_one(:user, {:name => 'Jane Smith'})
-        user1.should eq user2
+        user1.monger_id.should eq user2.monger_id
       end
 
       it "supports limits" do

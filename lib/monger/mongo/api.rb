@@ -11,9 +11,9 @@ module Monger
       end
 
       def find(type, criteria, options={})
-        docs = @db.find(type, criteria, options)
+        cursor_docs = @db.find(type, criteria, options)
         map = @config.maps[type]
-        docs.each {|doc, index| build_lazy_mapped_collections(map, doc)}
+        docs = cursor_docs.map {|doc| build_lazy_mapped_collections(map, doc)}
         docs.map {|doc| @mapper.doc_to_entity(map, doc, options)}
       end
 
@@ -101,6 +101,8 @@ module Monger
             doc[name.to_s] = @db.query[prop.type.to_s].find({ "#{prop.ref_name}_id" => doc['_id'] }, { :fields => %w(_ids) })
           end
         end
+
+        doc
       end
 
       public
