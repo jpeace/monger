@@ -30,11 +30,11 @@ module Monger
       end
 
       def inverse_collection_properties
-        collection_properties.select{|n,p| p.inverse?}
+        collection_properties.select{|n,p| p.inverse? and not p.inline?}
       end
 
       def mapped_collection_properties
-        collection_properties.select{|n,p| not p.inverse?}
+        collection_properties.select{|n,p| not p.inverse? and not p.inline?}
       end
 
       def add_property(name, klass=nil, mode=:direct, options={})

@@ -26,7 +26,9 @@ module Monger
         @config.mongo_hooks[:before_write].each {|proc| proc.call(type, doc)} unless skip_hooks
         puts "Mongo Insert: #{type.inspect} #{doc.inspect}" if @config.verbose?
 
-        @db[type.to_s].insert(doc)
+        doc.delete("_id")
+        doc.delete(:_id)
+        doc[:id] = @db[type.to_s].insert(doc)
         @db.get_last_error
       end
 
