@@ -2,6 +2,8 @@ module Monger
   module Mongo
     class Api
 
+      attr_reader :config
+
       def initialize(config, db)
         @config = config
         @db = db
@@ -9,9 +11,10 @@ module Monger
       end
 
       def find(type, criteria, options={})
-        docs = @db.find(type, criteria, options).map {|doc| @mapper.doc_to_entity(type, doc, options)}
-        entities = docs.map {|doc| @mapper.doc_to_entity(@config.maps[type], doc, options)}
-
+        docs = @db.find(type, criteria, options)
+        map = @config.maps[type]
+        docs.each {|doc, index| build_lazy_mapped_collections(map, doc)}
+        docs.map {|doc| @mapper.doc_to_entity(map, doc, options)}
       end
 
       def find_all(type, options={})
@@ -22,6 +25,7 @@ module Monger
         options.merge!({:limit => 1})
         doc = @db.find(type, criteria, options).first
         map = @config.maps[type]
+        build_lazy_mapped_collections(map, doc)
         @mapper.doc_to_entity(map, doc, options)
       end
 
@@ -55,64 +59,13 @@ module Monger
       end
 
       def save(entity, options={})
-        inline = options[:inline] || false
-        skip_hooks = options[:skip_hooks] || false
-
         type = entity.class.build_symbol
-
-        doc = @mapper.entity_to_doc entity
-
-        if !inline
-          if entity.monger_id.nil?
-            @db.insert(type, doc, options)
-            entity.monger_id = doc.monger_id
-          else
-            doc.monger_id = entity.monger_id
-          end
-        end
-
         map = @config.maps[type]
-        map.properties.each do |name, prop|
-          value = entity.get_property(name)
-          next if value.nil?
+        docs = @mapper.entity_to_docs(map, entity)
 
-          case prop.mode
-            when :direct, :date
-              doc[name.to_s] = value
-            when :time
-              doc[name.to_s] = {'hour' => value.hour, 'minute' => value.minute, 'second' => value.second}
-            when :reference
-              if prop.inline?
-                doc[name.to_s] = save(value, :inline => true, :skip_hooks => skip_hooks)
-              else
-                save(value, :skip_hooks => skip_hooks) if value.monger_id.nil? || prop.update?
-                doc["#{name}_id"] = value.monger_id
-              end
-            when :collection
-              value.each do |el|
-                if prop.inline?
-                  doc[name.to_s] ||= []
-                  doc[name.to_s] << save(el, :inline => true, :skip_hooks => skip_hooks)
-                elsif prop.inverse?
-                  doc[name.to_s] ||= []
-                  save(el, :skip_hooks => skip_hooks) if el.monger_id.nil?
-                  doc[name.to_s] << el.monger_id if el.respond_to? :monger_id
-                else
-                  if el.monger_id.nil? || prop.update?
-                    save(el, :extra => {"#{prop.ref_name}_id" => entity.monger_id}, :skip_hooks => skip_hooks)
-                  end
-                end
-              end
-          end
+        docs.each do |type, doc_list|
+          doc_list.each {|doc| @db.update(type, doc, options)}
         end
-
-        extra = options[:extra] || {}
-        extra.each do |k,v|
-          doc[k] = v
-        end
-
-        @db.update(type, doc, options) unless inline
-        return doc
       end
 
       private
@@ -138,6 +91,14 @@ module Monger
           if prop.delete?
             collection = find(prop.type, {"#{prop.ref_name}_id" => id})
             collection.each {|i| delete(prop.type, i.monger_id)}
+          end
+        end
+      end
+
+      def build_lazy_mapped_collections(map, doc)
+        map.mapped_collection_properties.each do |name, prop|
+          if prop.lazy?
+            doc[name.to_s] = @db.query[prop.type.to_s].find({ "#{prop.ref_name}_id" => doc['_id'] }, { :fields => %w(_ids) })
           end
         end
       end

@@ -1,6 +1,7 @@
 module Monger
   module Mongo
     module Placeholders
+      # this class eager loads all references of an inverse collection on access
       class EagerInverseCollectionPlaceholder
 
         attr_reader :ids
@@ -18,12 +19,8 @@ module Monger
             criteria[:$or] << { :_id => id }
           end
           entity_list = @api.find(@prop.type, criteria)
-          @parent.send("#{@prop.name}=", entity_list )
-          args.empty? ? parent_property.send(method, &block) : parent_property.send(method, *args, &block)
-        end
-
-        def parent_property
-          @parent.method(@prop.name).call
+          @parent.set_property(@prop.name, entity_list)
+          args.empty? ? @parent.get_property(@prop.name).send(method, &block) : @parent.get_property(@prop.name).send(method, *args, &block)
         end
 
       end

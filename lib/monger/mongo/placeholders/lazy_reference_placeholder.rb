@@ -1,6 +1,7 @@
 module Monger
   module Mongo
     module Placeholders
+      # this class lazy loads a reference
       class LazyReferencePlaceholder
 
         def monger_id
@@ -16,7 +17,7 @@ module Monger
 
         def method_missing(method, *args, &block)
           entity = @api.find_by_id(@prop.type, @id)
-          @parent.send("#{@prop.name}=", entity)
+          @parent.set_property(@prop.name, entity)
           args.empty? ? entity.send(method, &block) : entity.send(method, *args, &block)
         end
 
