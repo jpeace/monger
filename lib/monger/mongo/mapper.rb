@@ -87,30 +87,6 @@ module Monger
         collection
       end
 
-      def entity_to_docs(map, entity)
-        type = entity.class.build_symbol
-        docs = {}
-        docs[type] = [ entity_to_doc(map, entity) ]
-
-        map.reference_properties.each do |name, prop|
-          docs[prop.type] = [ ] if docs[prop.type].nil?
-          reference = entity.get_property(name)
-          docs[prop.type] << entity_to_docs(@api.config.maps[prop.type], reference) unless is_placeholder?(reference)
-        end
-
-        map.collection_properties.each do |name, prop|
-          docs[prop.type] = [ ] if docs[prop.type].nil?
-          reference_list = entity.get_property(name)
-          unless is_placeholder?(reference_list)
-            reference_list.each do |reference|
-              docs[prop.type] << entity_to_docs(@api.config.maps[prop.type], reference) unless is_placeholder?(reference)
-            end
-          end
-        end
-
-        docs
-      end
-
       def entity_to_doc(map, entity, options={})
         doc = {}
 
@@ -146,10 +122,35 @@ module Monger
         doc
       end
 
+      def entity_to_docs(map, entity)
+        type = entity.class.build_symbol
+        docs = {}
+        docs[type] = [ entity_to_doc(map, entity) ]
+
+        map.reference_properties.each do |name, prop|
+          docs[prop.type] = [ ] if docs[prop.type].nil?
+          reference = entity.get_property(name)
+          docs[prop.type] << entity_to_docs(@api.config.maps[prop.type], reference) unless is_placeholder?(reference)
+        end
+
+        map.collection_properties.each do |name, prop|
+          docs[prop.type] = [ ] if docs[prop.type].nil?
+          reference_list = entity.get_property(name)
+          unless is_placeholder?(reference_list)
+            reference_list.each do |reference|
+              docs[prop.type] << entity_to_docs(@api.config.maps[prop.type], reference) unless is_placeholder?(reference)
+            end
+          end
+        end
+
+        docs
+      end
+
       def is_placeholder?(entity)
         [
           Placeholders::LazyReferencePlaceholder,
-          Placeholders::LazyCollectionPlaceholder,
+          Placeholders::LazyCollectionReferencePlaceholder,
+          Placeholders::LazyMappedCollectionPlaceholder,
           Placeholders::EagerInverseCollectionPlaceholder,
           Placeholders::EagerMappedCollectionPlaceholder
         ].include?(entity.class)

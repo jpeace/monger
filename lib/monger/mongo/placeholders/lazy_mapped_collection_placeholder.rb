@@ -18,7 +18,7 @@ module Monger
         def method_missing(method, *args, &block)
           ids = @cursor.to_a.map {|doc| doc['_id']}
           entity_list = ids.each_with_index.map {|id, index| LazyCollectionReferencePlaceholder.new(@api, @parent, @prop, index, id)}
-          @parent.set_property(@prop, entity_list)
+          @parent.set_property(@prop.name, entity_list)
           args.empty? ? entity_list.send(method, &block) : entity_list.send(method, *args, &block)
         end
 
