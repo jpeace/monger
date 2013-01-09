@@ -64,7 +64,16 @@ module Monger
         docs = @mapper.entity_to_docs(map, entity)
 
         docs.each do |type, doc_list|
-          doc_list.each {|doc| @db.update(type, doc, options)}
+          doc_list.each do |pair|
+            doc = pair[:doc]
+            entity = pair[:entity]
+            if doc.monger_id.nil?
+              @db.insert(type, doc, options)
+              entity.monger_id = doc.monger_id
+            else
+              @db.update(type, doc, options)
+            end
+          end
         end
       end
 
