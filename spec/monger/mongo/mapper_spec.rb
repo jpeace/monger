@@ -12,7 +12,7 @@ describe Monger::Mongo::Mapper do
       real_config = Mocks.real_config
       blog_post_doc = find_in_db(:blog_post, Database::blog_post_id)
       user_doc = find_in_db(:user, Database::user_id)
-      user_doc['co_posts'] = Database::db['blog_post'].find({ :coauthor_id => Database::user_id }).map {|post| post.monger_id}
+      user_doc['co_posts'] = Database::db['blog_post'].find({ :coauthor_id => Database::user_id })
       @blog_post = subject.doc_to_entity(real_config.maps[:blog_post], blog_post_doc)
       @user = subject.doc_to_entity(real_config.maps[:user], user_doc)
     end
@@ -79,7 +79,7 @@ describe Monger::Mongo::Mapper do
 
     it "can map mapped collections set to be lazy loaded" do
       @user.co_posts.should be_a Monger::Mongo::Placeholders::LazyMappedCollectionPlaceholder
-      @user.co_posts[0].should be Monger::Mongo::Placeholders::LazyCollectionReferencePlaceholder
+      @user.co_posts[0].should be_a Monger::Mongo::Placeholders::LazyCollectionReferencePlaceholder
       @user.co_posts[0].title.should eq "Blog Post"
       @user.co_posts[0].should be_a Domain::BlogPost
     end
