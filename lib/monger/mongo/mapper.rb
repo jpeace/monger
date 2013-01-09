@@ -131,7 +131,12 @@ module Monger
           docs[prop.type] = [ ] if docs[prop.type].nil?
           reference = entity.get_property(name)
           next if reference.nil? or is_placeholder?(reference)
-          docs[prop.type] << { :entity => reference, :doc => entity_to_docs(@api.config.maps[prop.type], reference) }
+          entity_to_docs(@api.config.maps[prop.type], reference).each do |reference_type, reference_list|
+            reference_list.each do |pair|
+              docs[reference_type] << { :entity => pair[:entity], :doc => pair[:doc]}
+            end
+          end
+
         end
 
         map.collection_properties.each do |name, prop|
@@ -140,12 +145,20 @@ module Monger
           next if reference_list.nil? or is_placeholder?(reference_list)
           reference_list.each do |reference|
             next if reference.nil? or is_placeholder?(reference)
-            docs[prop.type] << { :entity => reference, :docs => entity_to_docs(@api.config.maps[prop.type], reference) }
+            entity_to_docs(@api.config.maps[prop.type], reference).each do |reference_type, inner_reference_list|
+              inner_reference_list.each do |pair|
+                docs[reference_type] << { :entity => pair[:entity], :doc => pair[:doc]}
+              end
+            end
           end
         end
 
+        puts docs
+
         docs
       end
+
+      private
 
       def is_placeholder?(entity)
         [
@@ -156,6 +169,7 @@ module Monger
           Placeholders::EagerMappedCollectionPlaceholder
         ].include?(entity.class)
       end
+
     end  
   end
 end
