@@ -1,3 +1,5 @@
+require "../../spec_helper"
+
 include Database
 
 describe Monger::Mongo::Mapper do
@@ -62,10 +64,10 @@ describe Monger::Mongo::Mapper do
 
     it "can map inverse collections set to be lazy loaded" do
       @user.likes.class.should eq Array
-      @user.likes[0].should be_a Monger::Mongo::Placeholders::LazyCollectionPlaceholder
+      @user.likes[0].should be_a Monger::Mongo::Placeholders::LazyCollectionReferencePlaceholder
       @user.likes[0].title.should eq "Post1"
       @user.likes[0].should be_a Domain::BlogPost
-      @user.likes[1].should be_a Monger::Mongo::Placeholders::LazyCollectionPlaceholder
+      @user.likes[1].should be_a Monger::Mongo::Placeholders::LazyCollectionReferencePlaceholder
     end
 
     it "can map mapped collections set to be eager loaded" do
@@ -76,8 +78,8 @@ describe Monger::Mongo::Mapper do
     end
 
     it "can map mapped collections set to be lazy loaded" do
-      @user.co_posts.class.should eq Array
-      @user.co_posts[0].should be_a Monger::Mongo::Placeholders::LazyCollectionPlaceholder
+      @user.co_posts.should be_a Monger::Mongo::Placeholders::LazyMappedCollectionPlaceholder
+      @user.co_posts[0].should be Monger::Mongo::Placeholders::LazyCollectionReferencePlaceholder
       @user.co_posts[0].title.should eq "Blog Post"
       @user.co_posts[0].should be_a Domain::BlogPost
     end
