@@ -38,7 +38,7 @@ module Monger
                 if prop.eager?
                   reference_entity = @api.find_by_id(prop.type, reference_id, options) unless reference_id.nil?
                 else
-                  reference_entity = Placeholders::LazyReferencePlaceholder.new(@api, entity, prop, reference_id) unless reference_id.nil?
+                  reference_entity = ::Monger::Placeholders::LazyReferencePlaceholder.new(@api, entity, prop, reference_id) unless reference_id.nil?
                 end
               end
 
@@ -54,18 +54,18 @@ module Monger
                 if prop.eager?
                   if prop.inverse?
                     reference_ids = doc[name.to_s]
-                    collection = Placeholders::EagerInverseCollectionPlaceholder.new(@api, entity, prop, reference_ids)
+                    collection = ::Monger::Placeholders::EagerInverseCollectionPlaceholder.new(@api, entity, prop, reference_ids)
                   else
-                    collection = Placeholders::EagerMappedCollectionPlaceholder.new(@api, entity, prop)
+                    collection = ::Monger::Placeholders::EagerMappedCollectionPlaceholder.new(@api, entity, prop)
                   end
                 else
                   if prop.inverse?
                     reference_ids = doc[name.to_s]
-                    collection = reference_ids.each_with_index.map{|id, index| Placeholders::LazyCollectionReferencePlaceholder.new(@api, entity, prop, index, id)} if reference_ids.class == Array
+                    collection = reference_ids.each_with_index.map{|id, index| ::Monger::Placeholders::LazyCollectionReferencePlaceholder.new(@api, entity, prop, index, id)} if reference_ids.class == Array
                   else
                     # for a lazy loaded mapped collection, the doc[name.to_s] is a cursor prebuilt in the api request
                     cursor = doc[name.to_s]
-                    collection = Placeholders::LazyMappedCollectionPlaceholder.new(@api, entity, prop, cursor)
+                    collection = ::Monger::Placeholders::LazyMappedCollectionPlaceholder.new(@api, entity, prop, cursor)
                   end
                 end
               end
@@ -122,51 +122,15 @@ module Monger
         doc
       end
 
-      def entity_to_docs(map, entity)
-        type = entity.class.build_symbol
-        docs = {}
-        docs[type] = [ { :entity => entity, :doc => entity_to_doc(map, entity) } ]
-
-        map.reference_properties.each do |name, prop|
-          docs[prop.type] = [ ] if docs[prop.type].nil?
-          reference = entity.get_property(name)
-          next if reference.nil? or is_placeholder?(reference)
-          entity_to_docs(@api.config.maps[prop.type], reference).each do |reference_type, reference_list|
-            reference_list.each do |pair|
-              docs[reference_type] << { :entity => pair[:entity], :doc => pair[:doc]}
-            end
-          end
-
-        end
-
-        map.collection_properties.each do |name, prop|
-          docs[prop.type] = [ ] if docs[prop.type].nil?
-          reference_list = entity.get_property(name)
-          next if reference_list.nil? or is_placeholder?(reference_list)
-          reference_list.each do |reference|
-            next if reference.nil? or is_placeholder?(reference)
-            entity_to_docs(@api.config.maps[prop.type], reference).each do |reference_type, inner_reference_list|
-              inner_reference_list.each do |pair|
-                docs[reference_type] << { :entity => pair[:entity], :doc => pair[:doc]}
-              end
-            end
-          end
-        end
-
-        puts docs
-
-        docs
-      end
-
       private
 
       def is_placeholder?(entity)
         [
-          Placeholders::LazyReferencePlaceholder,
-          Placeholders::LazyCollectionReferencePlaceholder,
-          Placeholders::LazyMappedCollectionPlaceholder,
-          Placeholders::EagerInverseCollectionPlaceholder,
-          Placeholders::EagerMappedCollectionPlaceholder
+            Placeholders::LazyReferencePlaceholder,
+            Placeholders::LazyCollectionReferencePlaceholder,
+            Placeholders::LazyMappedCollectionPlaceholder,
+            Placeholders::EagerInverseCollectionPlaceholder,
+            Placeholders::EagerMappedCollectionPlaceholder
         ].include?(entity.class)
       end
 

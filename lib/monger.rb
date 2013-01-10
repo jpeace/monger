@@ -1,5 +1,7 @@
 require 'monger/patches'
 require 'monger/config'
+require 'monger/placeholders'
+require 'monger/entity_graph'
 require 'monger/session'
 require 'monger/mongo'
 require 'monger/ember'
