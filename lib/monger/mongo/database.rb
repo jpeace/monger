@@ -28,7 +28,7 @@ module Monger
 
         doc.delete("_id")
         doc.delete(:_id)
-        doc[:id] = @db[type.to_s].insert(doc)
+        doc[:_id] = @db[type.to_s].insert(doc)
         @db.get_last_error
       end
 

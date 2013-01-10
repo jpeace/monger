@@ -60,11 +60,11 @@ module Monger
       end
 
       def save(entity, options={})
-        type = entity.class.build_symbol
         graph = @graph_builder.create_graph entity
         entity_list = graph.topo_sort.reverse
 
         entity_list.each do |entity|
+          type = entity.class.build_symbol
           map = @config.maps[entity.class.build_symbol]
           doc = @mapper.entity_to_doc(map, entity)
           if doc.monger_id.nil?
