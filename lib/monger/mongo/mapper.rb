@@ -125,7 +125,6 @@ module Monger
       def entity_to_docs(map, entity)
         type = entity.class.build_symbol
         docs = {}
-        docs[type] = [ { :entity => entity, :doc => entity_to_doc(map, entity) } ]
 
         map.reference_properties.each do |name, prop|
           docs[prop.type] = [ ] if docs[prop.type].nil?
@@ -153,7 +152,8 @@ module Monger
           end
         end
 
-        puts docs
+        docs[type] = [ ] if docs[type].nil?
+        docs[type] << { :entity => entity, :doc => entity_to_doc(map, entity) }
 
         docs
       end

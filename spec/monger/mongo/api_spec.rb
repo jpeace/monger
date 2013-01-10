@@ -172,6 +172,7 @@ describe ::Monger::Mongo::Api do
       subject.save(post, :atomic => true)
       post.author.monger_id.should_not be_nil
       doc = find_in_db(:blog_post, post.monger_id)
+      puts doc
       doc['author_id'].should eq post.author.monger_id
       doc = find_in_db(:user, post.author.monger_id)
       doc['name'].should eq 'John Doe'
