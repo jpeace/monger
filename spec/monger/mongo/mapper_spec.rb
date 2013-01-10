@@ -45,7 +45,7 @@ describe Monger::Mongo::Mapper do
     end
 
     it "can map references set to be lazy loaded" do
-      @blog_post.coauthor.should be_a Monger::Mongo::Placeholders::LazyReferencePlaceholder
+      @blog_post.coauthor.should be_a Monger::Placeholders::LazyReferencePlaceholder
       @blog_post.coauthor.name.should eq "Jane Smith"
       @blog_post.coauthor.should be_a Domain::Auth::User
     end
@@ -56,7 +56,7 @@ describe Monger::Mongo::Mapper do
     end
 
     it "can map inverse collections set to be eager loaded" do
-      @blog_post.shares.should be_a Monger::Mongo::Placeholders::EagerInverseCollectionPlaceholder
+      @blog_post.shares.should be_a Monger::Placeholders::EagerInverseCollectionPlaceholder
       @blog_post.shares[0].name.should eq "Jane Smith"
       @blog_post.shares.should be_a Array
       @blog_post.shares[0].should be_a Domain::Auth::User
@@ -64,22 +64,22 @@ describe Monger::Mongo::Mapper do
 
     it "can map inverse collections set to be lazy loaded" do
       @user.likes.class.should eq Array
-      @user.likes[0].should be_a Monger::Mongo::Placeholders::LazyCollectionReferencePlaceholder
+      @user.likes[0].should be_a Monger::Placeholders::LazyCollectionReferencePlaceholder
       @user.likes[0].title.should eq "Post1"
       @user.likes[0].should be_a Domain::BlogPost
-      @user.likes[1].should be_a Monger::Mongo::Placeholders::LazyCollectionReferencePlaceholder
+      @user.likes[1].should be_a Monger::Placeholders::LazyCollectionReferencePlaceholder
     end
 
     it "can map mapped collections set to be eager loaded" do
-      @user.comments.should be_a Monger::Mongo::Placeholders::EagerMappedCollectionPlaceholder
+      @user.comments.should be_a Monger::Placeholders::EagerMappedCollectionPlaceholder
       @user.comments[0].message.should eq "A comment"
       @user.comments.should be_a Array
       @user.comments[0].should be_a Domain::Comment
     end
 
     it "can map mapped collections set to be lazy loaded" do
-      @user.co_posts.should be_a Monger::Mongo::Placeholders::LazyMappedCollectionPlaceholder
-      @user.co_posts[0].should be_a Monger::Mongo::Placeholders::LazyCollectionReferencePlaceholder
+      @user.co_posts.should be_a Monger::Placeholders::LazyMappedCollectionPlaceholder
+      @user.co_posts[0].should be_a Monger::Placeholders::LazyCollectionReferencePlaceholder
       @user.co_posts[0].title.should eq "Blog Post"
       @user.co_posts[0].should be_a Domain::BlogPost
     end

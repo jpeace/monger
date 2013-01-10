@@ -7,6 +7,7 @@ module Monger
       def initialize(config, db)
         @config = config
         @db = db
+        @graph_builder = ::Monger::EntityGraph::GraphBuilder.new(config)
         @mapper = ::Monger::Mongo::Mapper.new(self)
       end
 
@@ -60,21 +61,20 @@ module Monger
 
       def save(entity, options={})
         type = entity.class.build_symbol
-        map = @config.maps[type]
-        docs = @mapper.entity_to_docs(map, entity)
+        graph = @graph_builder.create_graph entity
+        entity_list = graph.topo_sort.reverse
 
-        docs.each do |type, doc_list|
-          doc_list.each do |pair|
-            doc = pair[:doc]
-            entity = pair[:entity]
-            if doc.monger_id.nil?
-              @db.insert(type, doc, options)
-              entity.monger_id = doc.monger_id
-            else
-              @db.update(type, doc, options)
-            end
+        entity_list.each do |entity|
+          map = @config.maps[entity.class.build_symbol]
+          doc = @mapper.entity_to_doc(map, entity)
+          if doc.monger_id.nil?
+            @db.insert(type, doc, options)
+            entity.monger_id = doc.monger_id
+          else
+            @db.update(type, doc, options)
           end
         end
+
       end
 
       private
