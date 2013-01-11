@@ -1,5 +1,3 @@
-require "../../spec_helper"
-
 include Database
 
 describe Monger::Mongo::Mapper do
