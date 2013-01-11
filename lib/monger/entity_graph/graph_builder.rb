@@ -6,6 +6,7 @@ module Monger
         @config = config
       end
 
+      # TODO: remove is_placeholder? from all these classes, and put placeholder features in a single manager
       def create_graph(entity)
         type = entity.class.build_symbol
         map = @config.maps[type]
@@ -29,7 +30,11 @@ module Monger
             next if reference.nil? or is_placeholder? reference
 
             graph.add_subgraph create_graph(reference)
-            graph.add_edge(entity, reference)
+            if prop.inverse?
+              graph.add_edge(entity, reference)
+            else
+              graph.add_edge(reference, entity)
+            end
           end
         end
 

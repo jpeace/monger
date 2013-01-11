@@ -177,7 +177,6 @@ describe ::Monger::Mongo::Api do
       doc['name'].should eq 'John Doe'
 
       # Collections
-      puts "before collection"
       post.comments = [Domain::Comment.new {|c| c.message = 'Comment!'}]
       subject.save(post, :atomic => true)
       comment = post.comments.first
@@ -199,7 +198,7 @@ describe ::Monger::Mongo::Api do
       subject.save(comment, :atomic => true)
 
       post = subject.find_by_id(:blog_post, post.monger_id)
-      post.comments.should have_exactly(1).items
+      post.comments.length.should eq 1
       post.comments[0].message.should eq 'Changed!'
     end
 
