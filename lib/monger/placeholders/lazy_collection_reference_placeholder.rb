@@ -18,7 +18,7 @@ module Monger
       def method_missing(method, *args, &block)
         entity = @api.find_by_id(@prop.type, @id)
         @parent.get_property(@prop.name).send("[]=", @index, entity)
-        args.empty? ? entity.send(method, &block) : entity.send(method, *args, &block)
+        args.empty? ? entity.send(method, &block) : entity.send(method, *args, &block) unless entity.nil?
       end
 
     end
