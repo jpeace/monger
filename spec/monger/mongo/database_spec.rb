@@ -1,3 +1,5 @@
+require "../../spec_helper"
+
 describe Monger::Mongo::Database do
   before(:each) do
     @config = Mocks.real_config
