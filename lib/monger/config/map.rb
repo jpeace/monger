@@ -39,7 +39,6 @@ module Monger
 
       def add_property(name, klass=nil, mode=:direct, options={})
         ref_name = options[:ref_name] || nil
-        update = options[:update] || false
         inline = options[:inline] || false
         delete = options[:delete] || false
         inverse = options[:inverse] || false
@@ -49,7 +48,6 @@ module Monger
           p.mode = mode
           p.klass = klass
           p.ref_name = ref_name
-          p.update = update
           p.inline = inline
           p.delete = delete
           p.inverse = inverse

@@ -19,7 +19,7 @@ module Monger
         end
         entity_list = @api.find(@prop.type, criteria)
         @parent.set_property(@prop.name, entity_list)
-        args.empty? ? @parent.get_property(@prop.name).send(method, &block) : @parent.get_property(@prop.name).send(method, *args, &block)
+        args.empty? ? entity_list.send(method, &block) : entity_list.send(method, *args, &block)
       end
 
     end
