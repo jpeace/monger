@@ -63,18 +63,22 @@ module Monger
         graph = @graph_builder.create_graph entity
         entity_list = graph.topo_sort.reverse
 
+        mapped_entities = [ ]
         entity_list.each do |entity|
           type = entity.class.build_symbol
-          map = @config.maps[entity.class.build_symbol]
+          map = @config.maps[type]
+
           doc = @mapper.entity_to_doc(map, entity)
+          ensure_mapped_ids(doc, entity, mapped_entities)
           if doc.monger_id.nil?
             @db.insert(type, doc, options)
             entity.monger_id = doc.monger_id
           else
             @db.update(type, doc, options)
           end
-        end
 
+          register_mapped_references(entity, map, mapped_entities)
+        end
       end
 
       private
@@ -104,6 +108,7 @@ module Monger
         end
       end
 
+      # used to set the cursors to pass on to the placeholders for lazy mapped collections
       def build_lazy_mapped_collections(map, doc)
         map.mapped_collection_properties.each do |name, prop|
           if prop.lazy?
@@ -112,6 +117,40 @@ module Monger
         end
 
         doc
+      end
+
+      # edits the registry of mapped references to list all entities that will need to add parent entity ids
+      # TODO: remove is_placeholder? from all these classes, and put placeholder features in a single manager
+      def register_mapped_references(entity, map, mapped_entities)
+        map.mapped_collection_properties.each do |name, prop|
+          type = prop.type
+          reference_list = entity.get_property(name.to_s)
+          next if reference_list.nil? or is_placeholder? reference_list
+          reference_list.each do |reference|
+            next if reference.nil? or is_placeholder? reference
+            mapped_entities << { :entity => reference, :key => "#{prop.ref_name}_id", :value => entity.monger_id }
+          end
+        end
+      end
+
+      # checks the mapped entities registry to see if there are mappings to be added to the doc
+      def ensure_mapped_ids(doc, entity, mapped_entities)
+        mapped_entities.each do |mapped_entity|
+          if mapped_entity[:entity] == entity
+            doc[mapped_entity[:key]] = mapped_entity[:value]
+            mapped_entities.delete mapped_entity
+          end
+        end
+      end
+
+      def is_placeholder?(entity)
+        [
+            Placeholders::LazyReferencePlaceholder,
+            Placeholders::LazyCollectionReferencePlaceholder,
+            Placeholders::LazyMappedCollectionPlaceholder,
+            Placeholders::EagerInverseCollectionPlaceholder,
+            Placeholders::EagerMappedCollectionPlaceholder
+        ].include?(entity.class)
       end
 
       public

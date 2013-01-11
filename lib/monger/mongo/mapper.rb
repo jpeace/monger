@@ -87,6 +87,7 @@ module Monger
         collection
       end
 
+      # TODO: remove is_placeholder? from all these classes, and put placeholder features in a single manager
       def entity_to_doc(map, entity, options={})
         doc = {}
 
