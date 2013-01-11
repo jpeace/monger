@@ -54,7 +54,7 @@ describe Monger::Configuration do
       config.add_modules([Module1])
       config.hook_mongo :before_read do
       end
-      config.maps[:entity] = Monger::Config::Map.new
+      config.maps[:entity] = Monger::Config::Map.new Domain::Tag
 
       return config
     end
@@ -73,7 +73,7 @@ describe Monger::Configuration do
       end
       config.hook_mongo :before_write do
       end
-      config.maps[:new_entity] = Monger::Config::Map.new
+      config.maps[:new_entity] = Monger::Config::Map.new Domain::Tag
 
       return config
     end
