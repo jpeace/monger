@@ -25,6 +25,8 @@ module Monger
       def find_one(type, criteria, options={})
         options.merge!({:limit => 1})
         doc = @db.find(type, criteria, options).first
+        return nil if doc.nil?
+
         map = @config.maps[type]
         build_lazy_mapped_collections(map, doc)
         @mapper.doc_to_entity(map, doc, options)

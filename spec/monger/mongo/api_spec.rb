@@ -97,6 +97,7 @@ describe ::Monger::Mongo::Api do
       subject.delete(:blog_post, post1.monger_id, :atomic=>true)
       user = subject.find_by_id(:user, user.monger_id)
       user.likes.length.should eq 2
+      puts "in spec"
       user.likes[0].title.should eq('Post2')
     end
 
