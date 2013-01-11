@@ -45,22 +45,22 @@ module Monger
               entity.set_property(name, reference_entity)
 
             when :collection
-              collection = []
+              collection = [ ]
 
               if prop.inline?
                 reference_docs = doc[name.to_s]
-                collection = docs_to_entities(@api.config.maps[prop.type], reference_docs, options)
+                collection = docs_to_entities(@api.config.maps[prop.type], reference_docs, options) unless reference_docs.nil?
               else
                 if prop.eager?
                   if prop.inverse?
-                    reference_ids = doc[name.to_s]
+                    reference_ids = doc[name.to_s] || [ ]
                     collection = ::Monger::Placeholders::EagerInverseCollectionPlaceholder.new(@api, entity, prop, reference_ids)
                   else
                     collection = ::Monger::Placeholders::EagerMappedCollectionPlaceholder.new(@api, entity, prop)
                   end
                 else
                   if prop.inverse?
-                    reference_ids = doc[name.to_s]
+                    reference_ids = doc[name.to_s] || [ ]
                     collection = reference_ids.each_with_index.map{|id, index| ::Monger::Placeholders::LazyCollectionReferencePlaceholder.new(@api, entity, prop, index, id)} if reference_ids.class == Array
                   else
                     # for a lazy loaded mapped collection, the doc[name.to_s] is a cursor prebuilt in the api request
@@ -78,7 +78,7 @@ module Monger
       end
 
       def docs_to_entities(map, docs, options={})
-        collection = []
+        collection = [ ]
 
         docs.each do |doc|
           collection << doc_to_entity(map, doc, options) unless doc.nil?

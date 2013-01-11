@@ -26,7 +26,7 @@ map :blog_post do |p|
   p.has_a :author, :type => :user, :delete => true, :load_type => :eager
   p.has_a :coauthor, :type => :user
   p.has_many :shares, :type => :user, :inverse => true, :load_type => :eager
-  p.has_many :comments, :type => :comment, :update => true, :delete => true
+  p.has_many :comments, :type => :comment, :delete => true
   p.has_many :tags, :type => :tag, :inline => true
   p.has_a :related_links, :type => :related, :inline => true
 end
