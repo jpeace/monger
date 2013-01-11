@@ -253,7 +253,7 @@ describe ::Monger::Mongo::Api do
       doc['title'].should eq 'Changed Title'
     end
 
-    it "does not update indirect properties by default" do
+    it "updates indirect properties when they have changed" do
       post = Domain::BlogPost.new do |p|
         p.author = Domain::Auth::User.new do |u|
           u.name = 'John Doe'
@@ -263,24 +263,13 @@ describe ::Monger::Mongo::Api do
       post.author.name = 'New Name'
       subject.save(post, :atomic => true)
       doc = find_in_db(:user, post.author.monger_id)
-      doc['name'].should eq 'John Doe'
-    end
-
-    it "updates indirect properties when they are marked with the :update option" do
-      post = Domain::BlogPost.new do |p|
-        p.comments = [Domain::Comment.new {|c| c.message = 'Comment!'}]
-      end
-      subject.save(post, :atomic => true)
-      post.comments[0].message = 'New!'
-      subject.save(post, :atomic => true)
-      doc = find_in_db(:comment, post.comments[0].monger_id)
-      doc['message'].should eq 'New!'
+      doc['name'].should eq 'New Name'
     end
 
     it "writes inline properties" do
       post = Domain::BlogPost.new do |p|
         p.related_links = Domain::Related.new do |r|
-          r.urls = ['http://www.google.com']
+          r.urls = %w(http://www.google.com)
         end
       end
       post.add_tag('tag1')
@@ -292,7 +281,7 @@ describe ::Monger::Mongo::Api do
       subject.save(post, :atomic => true)
 
       doc = find_in_db(:blog_post, post.monger_id)
-      doc['related_links']['urls'].should eq ['http://www.google.com']
+      doc['related_links']['urls'].should eq %w(http://www.google.com)
       doc['tags'][0]['name'].should eq 'tag1'
       doc['tags'][0]['meta']['data'].should eq 'metadata'
       doc['tags'][1]['name'].should eq 'tag2'
