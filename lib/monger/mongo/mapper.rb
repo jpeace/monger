@@ -61,7 +61,7 @@ module Monger
                 else
                   if prop.inverse?
                     reference_ids = doc[name.to_s] || [ ]
-                    collection = reference_ids.each_with_index.map{|id, index| ::Monger::Placeholders::LazyCollectionReferencePlaceholder.new(@api, entity, prop, index, id)} if reference_ids.class == Array
+                    collection = reference_ids.map{|id| ::Monger::Placeholders::LazyCollectionReferencePlaceholder.new(@api, entity, prop, id)} if reference_ids.class == Array
                   else
                     # for a lazy loaded mapped collection, the doc[name.to_s] is a cursor prebuilt in the api request
                     cursor = doc[name.to_s]
