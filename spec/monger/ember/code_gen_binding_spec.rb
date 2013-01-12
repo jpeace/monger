@@ -16,16 +16,18 @@ describe Monger::Ember::CodeGenBinding do
   end
 
   it "exposes an alphabetized property list" do
-    subject.properties.map{|k,v|k}.should eq [:author,:body,:comments,:date,:related_links,:tags,:time,:title]
+    subject.properties.map{|k,v|k}.should eq [:author,:body,:coauthor, :comments,:date,:related_links,:shares, :tags,:time,:title]
   end
 
   it "exposes an initialization list" do
     initialization_list = %{id:'',
 author:'',
 body:'',
+coauthor:'',
 comments:[],
 date:'',
 relatedLinks:'',
+shares:[],
 tags:[],
 time:'',
 title:''}
@@ -37,6 +39,10 @@ title:''}
 if (this.author) {
   author = this.author.serialize();
 }
+var coauthor = null;
+if (this.coauthor) {
+  coauthor = this.coauthor.serialize();
+}
 var comments = [];
 for (var i = 0 ; i < this.comments.length ; ++i) {
   comments.push(this.comments[i].serialize());
@@ -44,6 +50,10 @@ for (var i = 0 ; i < this.comments.length ; ++i) {
 var relatedLinks = null;
 if (this.relatedLinks) {
   relatedLinks = this.relatedLinks.serialize();
+}
+var shares = [];
+for (var i = 0 ; i < this.shares.length ; ++i) {
+  shares.push(this.shares[i].serialize());
 }
 var tags = [];
 for (var i = 0 ; i < this.tags.length ; ++i) {
@@ -56,9 +66,11 @@ for (var i = 0 ; i < this.tags.length ; ++i) {
     serialization_list = %{id:this.id,
 author:author,
 body:this.body,
+coauthor:coauthor,
 comments:comments,
 date:this.date,
 relatedLinks:relatedLinks,
+shares:shares,
 tags:tags,
 time:this.time,
 title:this.title}
@@ -69,9 +81,11 @@ title:this.title}
     mapping_list = %{id:obj.id,
 author:author,
 body:body,
+coauthor:coauthor,
 comments:comments,
 date:date,
 relatedLinks:relatedLinks,
+shares:shares,
 tags:tags,
 time:time,
 title:title}

@@ -1,6 +1,7 @@
-db = Monger::Mongo::Database
+include Database
 
 describe Monger::Mongo::Api do
+  db = ::Monger::Mongo::Database.new(Mocks::real_config)
   subject {described_class.new(Mocks::real_config, db)}
 
   def setup_tag
