@@ -2,9 +2,11 @@ Test.Domain.BlogPost = Ember.Object.extend({
 id:'',
 author:'',
 body:'',
+coauthor:'',
 comments:[],
 date:'',
 relatedLinks:'',
+shares:[],
 tags:[],
 time:'',
 title:'',
@@ -15,6 +17,10 @@ var author = null;
 if (this.author) {
   author = this.author.serialize();
 }
+var coauthor = null;
+if (this.coauthor) {
+  coauthor = this.coauthor.serialize();
+}
 var comments = [];
 for (var i = 0 ; i < this.comments.length ; ++i) {
   comments.push(this.comments[i].serialize());
@@ -22,6 +28,10 @@ for (var i = 0 ; i < this.comments.length ; ++i) {
 var relatedLinks = null;
 if (this.relatedLinks) {
   relatedLinks = this.relatedLinks.serialize();
+}
+var shares = [];
+for (var i = 0 ; i < this.shares.length ; ++i) {
+  shares.push(this.shares[i].serialize());
 }
 var tags = [];
 for (var i = 0 ; i < this.tags.length ; ++i) {
@@ -31,9 +41,11 @@ for (var i = 0 ; i < this.tags.length ; ++i) {
 id:this.id,
 author:author,
 body:this.body,
+coauthor:coauthor,
 comments:comments,
 date:this.date,
 relatedLinks:relatedLinks,
+shares:shares,
 tags:tags,
 time:this.time,
 title:this.title

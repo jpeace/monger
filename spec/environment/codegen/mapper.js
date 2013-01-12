@@ -3,14 +3,8 @@ Test.Mappers.blogPost = function(obj) {
     return null;
   }
 var author = Test.Mappers.user(obj.author);
-var coauthor = Test.Mappers.user(obj.coauthor);
 var body = obj.body;
-var shares = [];
-if (obj.shares) {
-    for (var i = 0 ; i < obj.shares.length ; ++i) {
-        shares.push(Test.Mappers.user(obj.shares[i]));
-    }
-}
+var coauthor = Test.Mappers.user(obj.coauthor);
 var comments = [];
 if (obj.comments) {
   for (var i = 0 ; i < obj.comments.length ; ++i) {
@@ -19,6 +13,12 @@ if (obj.comments) {
 }
 var date = obj.date;
 var relatedLinks = Test.Mappers.related(obj.relatedLinks);
+var shares = [];
+if (obj.shares) {
+  for (var i = 0 ; i < obj.shares.length ; ++i) {
+    shares.push(Test.Mappers.user(obj.shares[i]));
+  }
+}
 var tags = [];
 if (obj.tags) {
   for (var i = 0 ; i < obj.tags.length ; ++i) {
@@ -31,12 +31,12 @@ var title = obj.title;
 var entity = Test.Domain.BlogPost.create({
 id:obj.id,
 author:author,
-coauthor:coauthor,
 body:body,
-shares:shares,
+coauthor:coauthor,
 comments:comments,
 date:date,
 relatedLinks:relatedLinks,
+shares:shares,
 tags:tags,
 time:time,
 title:title
