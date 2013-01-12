@@ -1,8 +1,7 @@
-include Database
+db = ::Monger::Mongo::Database
 
 describe Monger::Mongo::Api do
-  db = ::Monger::Mongo::Database.new(Mocks::real_config)
-  subject {described_class.new(Mocks::real_config, db)}
+  subject {described_class.new(Mocks::real_config, db.new(Mocks::real_config))}
 
   def setup_tag
     t = Domain::Tag.new {|t| t.name = 'TEST TAG'}
@@ -45,31 +44,7 @@ describe Monger::Mongo::Api do
     end
 
     context "complex objects" do
-      it "executes the correct number of finds with out null relationships" do
-        setup_post
-        db.reset
-
-        subject.find_one(:blog_post, {:title => 'TEST POST'})
-        
-        db.finds.should have_exactly(3).items
-        db.finds_of_type(:blog_post).should have_exactly(1).items
-        db.finds_of_type(:user).should have_exactly(1).items
-        db.finds_of_type(:comment).should have_exactly(1).items
-
-        destroy_post
-      end
-
-      it "executes the correct number of finds with null relationships" do
-        setup_post(false)
-        db.reset
-
-        subject.find_one(:blog_post, {:title => 'TEST POST'})
-        db.finds.should have_exactly(2).items
-        db.finds_of_type(:blog_post).should have_exactly(1).items
-        db.finds_of_type(:comment).should have_exactly(1).items
-
-        destroy_post
-      end
+      
     end
   end
 end
