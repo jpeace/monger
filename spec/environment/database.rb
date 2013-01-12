@@ -56,10 +56,12 @@ module Database
   }
   Database::db['blog_post'].insert(post)
 
-  comment1 = {:_id => "50eb46cad264870783000005".to_monger_id, :user_id => user1.monger_id, :message => 'A comment', :blog_post_id => post.monger_id}
-  comment2 = {:_id => "50eb46cad264870783000006".to_monger_id, :user_id => user2.monger_id, :message => 'Another comment', :blog_post_id => post.monger_id, :important => nil}
-  Database::db['comment'].insert(comment1)
-  Database::db['comment'].insert(comment2)
+  comment1 = {:_id => "50eb46cad264870783000005".to_monger_id, :user_id => user1.monger_id, :message => 'A comment',       :blog_post_id => post.monger_id}
+  comment2 = {:_id => "50eb46cad264870783000006".to_monger_id, :user_id => user2.monger_id, :message => 'Another comment', :blog_post_id => post.monger_id,  :important => nil}
+  comment3 = {:_id => "50eb46cad264870783000185".to_monger_id, :user_id => user2.monger_id, :message => 'A third comment', :blog_post_id => post.monger_id, :important => nil}
+  Database::db['comment'].insert comment1
+  Database::db['comment'].insert comment2
+  Database::db['comment'].insert comment3
 
   def find_in_db(type, id)
     Database::db[type.to_s].find({:_id => id}).first

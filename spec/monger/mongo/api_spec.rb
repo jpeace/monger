@@ -65,9 +65,9 @@ describe ::Monger::Mongo::Api do
 
     it "reads collection properties" do
       post = subject.find_by_id(:blog_post, @blog_post_id_string)
-      post.comments.length.should eq 2
+      post.comments.length.should eq 3
       post.comments.each do |c|
-        ['A comment', 'Another comment'].should include(c.message)
+        ['A comment', 'Another comment', 'A third comment'].should include(c.message)
       end
     end
 
@@ -132,7 +132,7 @@ describe ::Monger::Mongo::Api do
 
       it "can handle bad limits" do
         comments = subject.find(:comment, {}, :limit => 'not really a limit')
-        comments.should have_exactly(2).items
+        comments.should have_exactly(3).items
       end
 
       it "loads full inverse collections when a limit is specified" do
