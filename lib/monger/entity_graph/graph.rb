@@ -14,14 +14,12 @@ module Monger
       end
 
       def add_edge(from_entity, to_entity)
+        add_node from_entity unless @nodes.include? from_entity
+        add_node to_entity unless @nodes.include? to_entity
         @edges << { :from => from_entity, :to => to_entity }
       end
 
       def add_subgraph(subgraph)
-        subgraph.nodes.each do |node|
-          add_node node unless @nodes.include? node
-        end
-
         subgraph.edges.each do |edge|
           add_edge(edge[:from], edge[:to]) unless @edges.include? edge
         end
