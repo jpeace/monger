@@ -16,7 +16,7 @@ module Monger
 
         map.reference_properties.each do |name, prop|
           reference = entity.get_property(name)
-          next if reference.nil? or is_placeholder? reference
+          next if prop.inline? or reference.nil? or is_placeholder? reference
 
           graph.add_subgraph create_graph(reference)
           graph.add_edge(entity, reference)
@@ -24,7 +24,7 @@ module Monger
 
         map.collection_properties.each do |name, prop|
           reference_list = entity.get_property(name)
-          next if reference_list.nil? or is_placeholder? reference_list
+          next if prop.inline? or reference_list.nil? or is_placeholder? reference_list
 
           reference_list.each do |reference|
             next if reference.nil? or is_placeholder? reference
