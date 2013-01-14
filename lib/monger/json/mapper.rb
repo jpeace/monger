@@ -12,7 +12,7 @@ module Monger
 
         type = obj.class.build_symbol
         map = @config.maps[type]
-        raise ArgumentError if map.nil?
+        raise ArgumentError, "Map not found for #{type}." if map.nil?
 
         hash = {}
         map.properties.each do |name, prop|
@@ -47,7 +47,7 @@ module Monger
         end
 
         map = @config.maps[type]
-        raise ArgumentError if map.nil?
+        raise ArgumentError, "Map not found for #{type}." if map.nil?
 
         obj = @config.build_object_of_type(type)
         map.properties.each do |name, prop|

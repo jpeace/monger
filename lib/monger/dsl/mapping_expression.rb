@@ -26,7 +26,7 @@ module Monger
       end
 
       def has_a(name, options={})
-        raise ArgumentError if options[:type].nil?
+        raise ArgumentError, "Type not found for #{name}." if options[:type].nil?
         type = options[:type]
         #map = @config.maps[type] this won't work yet because not all maps necessarily exist at the time of building this one
         klass = @config.find_class(type)
@@ -34,7 +34,7 @@ module Monger
       end
 
       def has_many(name, options={})
-        raise ArgumentError if options[:type].nil?
+        raise ArgumentError, "Type not found for #{name}." if options[:type].nil?
         type = options[:type]
         #map = @config.maps[type]
         klass = @config.find_class(type)

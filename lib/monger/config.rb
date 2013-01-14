@@ -51,7 +51,7 @@ module Monger
     end
 
     def hook_mongo(hook, &block)
-      raise ArgumentError unless @mongo_hooks.keys.include? hook
+      raise ArgumentError, "Unknown hook #{hook}." unless @mongo_hooks.keys.include? hook
       @mongo_hooks[hook] << block
     end
 
@@ -65,7 +65,7 @@ module Monger
           # Constant doesn't exist i.e. class is not in this module
         end
       end
-      raise ArgumentError
+      raise ArgumentError, "Can't find type #{type}"
     end
 
     # to be deprecated

@@ -6,7 +6,7 @@ module Monger
         if !type.nil?
           @type = type
           @map = @config.maps[@type]
-          raise ArgumentError if @map.nil?
+          raise ArgumentError, "Can't find map for type #{type}." if @map.nil?
         end
       end
 

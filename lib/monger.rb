@@ -22,7 +22,7 @@ class TimeOfDay
       when :pm
         @hour = hour + 12
       else
-        raise ArgumentError
+        raise ArgumentError, "Invalid period for time of day."
       end
     end
 
