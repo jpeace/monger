@@ -15,7 +15,25 @@ describe Monger::Configuration do
       obj = subject.build_object_of_type(:blog_post)
       obj.should be_is_a(Domain::BlogPost)
     end  
-  end  
+  end 
+
+  context "when reading external configuration files" do
+    def original_config
+      config = Monger::Configuration.new
+      config.maps[:entity] = Monger::Config::Map.new
+      return config
+    end
+
+    subject do
+      c = original_config
+      c.parse_external_config_file("#{File.dirname(__FILE__)}/../environment/config/external_config.rb")
+      c
+    end
+
+    it "brings in the additional configuration" do
+      subject.maps.should have_exactly(4).items
+    end
+  end
 
   context "when importing external configurations" do
     module Module1

@@ -45,6 +45,11 @@ module Monger
       @maps.merge!(config.maps)
     end
 
+    def parse_external_config_file(path)
+      dsl = Dsl::ConfigurationExpression.new(self)
+      dsl.instance_eval(File.read(path))
+    end
+
     def hook_mongo(hook, &block)
       raise ArgumentError unless @mongo_hooks.keys.include? hook
       @mongo_hooks[hook] << block

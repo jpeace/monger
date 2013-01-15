@@ -4,6 +4,13 @@ describe Monger::Dsl::ConfigurationExpression do
   before(:each) do
     config = Monger::Configuration.new  
   end
+
+  it 'can read external configuration files' do
+    config = double()
+    expression = described_class.new(config)
+    config.should_receive(:parse_external_config_file).with('/path/to/file')
+    expression.import_configuration '/path/to/file'
+  end
   
   it 'can bring in external configurations' do
     config = double()
