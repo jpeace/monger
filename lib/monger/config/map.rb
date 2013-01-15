@@ -2,31 +2,22 @@ module Monger
   module Config
     class Map
 
-      attr_reader :entity_class, :properties
+      attr_reader :entity_class, :type, :properties, :reference_properties, :collection_properties
       
-      def initialize(entity_class)
-        @entity_class = entity_class
+      def initialize(class_guess, type)
+        @entity_class = class_guess
+        @type = type
         @properties = {}
+        @reference_properties = {}
+        @collection_properties = {}
       end
 
       def build_entity
         @entity_class.new
       end
 
-      def direct_properties
-        @properties.select{|n,p| p.mode == :direct}
-      end
-
       def indirect_properties
-        @properties.select{|n,p| p.mode != :direct}
-      end
-
-      def reference_properties
-        @properties.select{|n,p| p.mode == :reference}
-      end
-
-      def collection_properties
-        @properties.select{|n,p| p.mode == :collection}
+        @reference_properties.concat @collection_properties
       end
 
       def inverse_collection_properties
@@ -37,21 +28,33 @@ module Monger
         collection_properties.select{|n,p| not p.inverse? and not p.inline?}
       end
 
-      def add_property(name, klass=nil, mode=:direct, options={})
-        ref_name = options[:ref_name] || nil
-        inline = options[:inline] || false
-        delete = options[:delete] || false
-        inverse = options[:inverse] || false
+      def add_property(name, type)
+        @properties[name] = Property.new(name, type)
+      end
+
+      def add_reference_property(name, klass, options={})
+        type = options[:related_by] || :reference
+        raise ArgumentError, "#{type} is not a valid reference type." unless [ :value, :reference ].include? type
+
         load_type = options[:load_type] || :lazy
-        @properties[name] = Property.new do |p|
-          p.name = name
-          p.mode = mode
-          p.klass = klass
-          p.ref_name = ref_name
-          p.inline = inline
-          p.delete = delete
-          p.inverse = inverse
-          p.load_type = load_type
+        raise ArgumentError, "#{load_type} is not a valid load type." unless [ :lazy, :eager ].include? load_type
+
+        delete = options[:delete] || false
+
+        parent_property_name = options[:related_to_parent_by]
+
+        @reference_properties[name] = ReferenceProperty.new(name, klass) do |prop|
+          prop.inline = type == :value
+          prop.delete = delete
+          prop.load_type = load_type
+          attr_accessor :ref_name
+        end
+      end
+
+      # TODO: finish this function
+      def add_collection_property(name, klass, options={})
+        @reference_properties[name] = CollectionProperty.new(name, klass) do |prop|
+
         end
       end
     end

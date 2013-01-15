@@ -1,36 +1,14 @@
 module Monger
   module Config
     class Property
-      attr_accessor :name, :mode, :map, :klass
-      attr_accessor :ref_name, :inline, :delete, :inverse, :load_type
+      attr_accessor :name, :type
 
-      def initialize
+      def initialize(name, type)
+        @name = name
+        @type = type
         yield self if block_given?
       end
 
-      def inline?
-        @inline
-      end
-
-      def delete?
-        @delete
-      end
-
-      def inverse?
-        @inverse
-      end
-
-      def eager?
-        @load_type == :eager
-      end
-
-      def lazy?
-        @load_type == :lazy
-      end
-
-      def type
-        klass.build_symbol
-      end
     end
   end
 end
