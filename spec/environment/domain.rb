@@ -28,7 +28,10 @@ module Domain
       yield self if block_given?
     end
     def add_tag(tag)
-      @tags << Tag.new {|t| t.name=tag}
+      @tags << Tag.new {|t| t.name = tag}
+    end
+    def remove_tag(tag)
+      @tags = @tags.reject {|t| t.name == tag}
     end
   end
 

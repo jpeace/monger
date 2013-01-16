@@ -342,6 +342,28 @@ describe Monger::Mongo::Mapper do
       doc['tags'][0]['meta']['data'].should eq 'new metadata'
     end
 
+    it "removes inline collection elements" do
+      post = Domain::BlogPost.new
+      post.add_tag('tag1')
+      post.add_tag('tag2')
+      subject.save(post, :atomic => true)
+
+      doc = find_in_db(:blog_post, post.monger_id)
+      doc['tags'].should have_exactly(2).items
+
+      post.remove_tag('tag2')
+      subject.save(post, :atomic => true)
+
+      doc = find_in_db(:blog_post, post.monger_id)
+      doc['tags'].should have_exactly(1).items
+
+      post.remove_tag('tag1')
+      subject.save(post, :atomic => true)
+
+      doc = find_in_db(:blog_post, post.monger_id)
+      doc['tags'].should be_empty
+    end
+
     it "writes inverse collections" do
       post1 = Domain::BlogPost.new do |p|
         p.title = 'Post1'
@@ -362,6 +384,38 @@ describe Monger::Mongo::Mapper do
       post_ids = doc['likes']
       post_ids.should be_include(post1.monger_id)
       post_ids.should be_include(post2.monger_id)
+    end
+
+    it "updates inverse collections" do
+      post1 = Domain::BlogPost.new do |p|
+        p.title = 'Post1'
+      end
+      post2 = Domain::BlogPost.new do |p|
+        p.title = 'Post2'
+      end
+      subject.save(post1, :atomic => true)
+      subject.save(post2, :atomic => true)
+
+      user = Domain::Auth::User.new do |u|
+        u.name = 'Test'
+        u.likes = [post1, post2]
+      end
+      subject.save(user, :atomic => true)
+
+      doc = find_in_db(:user, user.monger_id)
+      doc['likes'].should have_exactly(2).items
+
+      user.likes = [post1]
+      subject.save(user, :atomic => true)
+
+      doc = find_in_db(:user, user.monger_id)
+      doc['likes'].should have_exactly(1).items
+
+      user.likes = []
+      subject.save(user, :atomic => true)
+
+      doc = find_in_db(:user, user.monger_id)
+      doc['likes'].should be_empty
     end
 
     it "inserts new elements when writing inverse collections" do
