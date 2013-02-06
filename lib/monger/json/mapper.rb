@@ -9,7 +9,7 @@ module Monger
         return obj.class.to_s if depth < 0
 
         if obj.is_a? Array
-          return obj.map {|i| get_hash(i, depth-1)}
+          return obj.map {|i| get_hash(i, depth)}
         end
 
         type = obj.class.build_symbol
@@ -29,9 +29,11 @@ module Monger
               when :time
                 hash[js_name] = val.to_12_hour
               when :reference
-                hash[js_name] = get_hash(val, depth-1) unless val.nil?
+                unless val.nil?
+                  hash[js_name] = prop.inline? ? get_hash(val, depth) : get_hash(val, depth-1)
+                end
               when :collection
-                hash[js_name] = val.map {|i| get_hash(i, depth-1)}
+                hash[js_name] = val.map {|i| prop.inline? ? get_hash(i, depth) : get_hash(i, depth-1)}
               else
                 hash[js_name] = val
             end

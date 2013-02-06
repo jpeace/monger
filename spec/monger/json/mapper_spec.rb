@@ -83,7 +83,9 @@ describe Monger::Json::Mapper do
     end
 
     it "serializes only to the given depth" do
-
+      hash = subject.get_hash(post, 0)
+      hash['author'] = 'Domain::Auth::User'
+      hash['comments'][0] = 'Domain::Comment'
     end
 
     it "works with reference properties" do
@@ -106,7 +108,7 @@ describe Monger::Json::Mapper do
     it "always serializes inline references" do
       hash = subject.get_hash(post, 0)
 
-      hash['relatedLinks'].should be_is_a Hash
+      hash['relatedLinks'].should be_a Hash
       hash['relatedLinks']['urls'].should eq ['http://www.google.com']
     end
 
