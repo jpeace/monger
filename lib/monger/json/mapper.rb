@@ -5,9 +5,11 @@ module Monger
         @config = config
       end
 
-      def get_hash(obj)
+      def get_hash(obj, depth)
+        return obj.class.to_s if depth < 0
+
         if obj.is_a? Array
-          return obj.map {|i| get_hash(i)}
+          return obj.map {|i| get_hash(i, depth-1)}
         end
 
         type = obj.class.build_symbol
@@ -22,16 +24,16 @@ module Monger
             hash[js_name] = nil
           else
             case prop.mode
-            when :direct
-              hash[js_name] = val
-            when :date
-              hash[js_name] = val.strftime('%-m/%-d/%Y')
-            when :time
-              hash[js_name] = val.to_12_hour
-            when :reference
-              hash[js_name] = get_hash(val) unless val.nil?
-            when :collection
-              hash[js_name] = val.map {|i| get_hash(i)}
+              when :date
+                hash[js_name] = val.strftime('%-m/%-d/%Y')
+              when :time
+                hash[js_name] = val.to_12_hour
+              when :reference
+                hash[js_name] = get_hash(val, depth-1) unless val.nil?
+              when :collection
+                hash[js_name] = val.map {|i| get_hash(i, depth-1)}
+              else
+                hash[js_name] = val
             end
           end
         end
@@ -55,19 +57,19 @@ module Monger
           next if val.nil?
 
           case prop.mode
-          when :direct
-            obj.set_property(name, val)
-          when :date
-            pieces = val.split('/')
-            if pieces.length == 3
-              obj.set_property(name, Time.utc(pieces[2], pieces[0], pieces[1]))
-            end
-          when :time
-            obj.set_property(name, TimeOfDay.from_string(val))
-          when :reference
-            obj.set_property(name, from_hash(prop.type, val))
-          when :collection
-            obj.set_property(name, val.map{|i| from_hash(prop.type, i)})
+            when :date
+              pieces = val.split('/')
+              if pieces.length == 3
+                obj.set_property(name, Time.utc(pieces[2], pieces[0], pieces[1]))
+              end
+            when :time
+              obj.set_property(name, TimeOfDay.from_string(val))
+            when :reference
+              obj.set_property(name, from_hash(prop.type, val))
+            when :collection
+              obj.set_property(name, val.map{|i| from_hash(prop.type, i)})
+            else
+              obj.set_property(name, val)
           end
         end
 
@@ -76,8 +78,8 @@ module Monger
         obj
       end
 
-      def entity_to_json(obj)
-        get_hash(obj).to_json
+      def entity_to_json(obj, depth=0)
+        get_hash(obj, depth).to_json
       end
 
       def json_to_entity(type, json)

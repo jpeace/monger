@@ -66,24 +66,28 @@ describe Monger::Json::Mapper do
   context "when serializing" do
     
     it "works with direct properties" do
-      hash = subject.get_hash(post)
+      hash = subject.get_hash(post, 0)
 
       hash['title'].should eq 'Title'
       hash['body'].should eq 'Body'
     end
 
     it "works with date properties" do
-      hash = subject.get_hash(post)
+      hash = subject.get_hash(post, 0)
       hash['date'].should eq '5/16/2012'
     end
 
     it "works with time properties" do
-      hash = subject.get_hash(post)
+      hash = subject.get_hash(post, 0)
       hash['time'].should eq '9:30 PM'
     end
 
+    it "serializes only to the given depth" do
+
+    end
+
     it "works with reference properties" do
-      hash = subject.get_hash(post)
+      hash = subject.get_hash(post, 1)
 
       hash['author'].should be_is_a Hash
       hash['author']['name'].should eq 'Author'
@@ -92,22 +96,22 @@ describe Monger::Json::Mapper do
     end
 
     it "works with collections" do
-      hash = subject.get_hash(post)
+      hash = subject.get_hash(post, 1)
 
       hash['comments'].should be_is_a Array
       hash['comments'].should have_exactly(1).items
       hash['comments'][0]['message'].should eq 'Comment!'
     end
 
-    it "works with inline references" do
-      hash = subject.get_hash(post)
+    it "always serializes inline references" do
+      hash = subject.get_hash(post, 0)
 
       hash['relatedLinks'].should be_is_a Hash
       hash['relatedLinks']['urls'].should eq ['http://www.google.com']
     end
 
-    it "works with inline collections" do
-      hash = subject.get_hash(post)
+    it "always serializes inline collections" do
+      hash = subject.get_hash(post, 0)
 
       hash['tags'].should be_is_a Array
       hash['tags'].should have_exactly(2).items
@@ -117,7 +121,7 @@ describe Monger::Json::Mapper do
 
     it "works with monger ids" do
       post.monger_id = Database::blog_post_id
-      hash = subject.get_hash(post)
+      hash = subject.get_hash(post, 0)
 
       hash['id'].should eq Database::blog_post_id.to_s
     end
