@@ -20,7 +20,7 @@ describe Monger::Configuration do
   context "when reading external configuration files" do
     def original_config
       config = Monger::Configuration.new
-      config.maps[:entity] = Monger::Config::Map.new
+      config.maps[:entity] = Monger::Config::Map.new(Domain::Tag)
       return config
     end
 
