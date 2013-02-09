@@ -25,5 +25,5 @@ end
 
 desc "Run benchmark tests"
 task :benchmark do
-	require_relative "#{File.dirname(__FILE__)}/spec/benchmark/mongo/api_benchmark"
+	require_relative "#{File.dirname(__FILE__)}/spec/benchmark/mongo/mapper_benchmark"
 end
