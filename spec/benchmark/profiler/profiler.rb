@@ -1,54 +1,61 @@
 require 'ruby-prof'
 
-module Monger
-	module Benchmark
+module Benchmark
 
-		class Profiler
+	class Profiler
 
-			def before_each(&block)
-				@before = Proc.new
-			end
+		def before_each(&block)
+			@before = Proc.new
+		end
 
-			def profile(name, &block)
-				run_profile(name, RubyProf::PROCESS_TIME, &block)
-				run_profile(name, RubyProf::MEMORY, &block)
-			end
+		def profile(name, options={}, &block)
+			run_profile(name, RubyProf::CPU_TIME, options, &block)
+			run_profile(name, RubyProf::PROCESS_TIME, options, &block)
+			run_profile(name, RubyProf::MEMORY, options, &block)
+			run_profile(name, RubyProf::WALL_TIME, options, &block)
+		end
 
-			def profile_cpu(name, &block)
-				run_profile(name, RubyProf::CPU_TIME, &block)
-			end
+		def profile_cpu(name, options={}, &block)
+			run_profile(name, RubyProf::CPU_TIME, options, &block)
+		end
 
-			def profile_process_time(name, &block)
-				run_profile(name, RubyProf::PROCESS_TIME, &block)
-			end
+		def profile_process_time(name, options={}, &block)
+			run_profile(name, RubyProf::PROCESS_TIME, options, &block)
+		end
 
-			def profile_memory(name, &block)
-				run_profile(name, RubyProf::MEMORY, &block)
-			end
+		def profile_memory(name, options={}, &block)
+			run_profile(name, RubyProf::MEMORY, options, &block)
+		end
 
-			def profile_wall_time(name, &block)
-				run_profile(name, RubyProf::WALL_TIME, &block)
-			end
+		def profile_wall_time(name, options={}, &block)
+			run_profile(name, RubyProf::WALL_TIME, options, &block)
+		end
 
-			private
+		private
 
-			def measurement_names
-				{ RubyProf::PROCESS_TIME => 'processor', RubyProf::MEMORY => 'memory' }
-			end
+		def measure_names
+			{ RubyProf::PROCESS_TIME => 'process_time', RubyProf::MEMORY => 'memory', RubyProf::CPU_TIME => 'cpu', RubyProf::WALL_TIME => 'wall_time' }
+		end
 
-			def run_profile(name, measure_mode, &block)
-				@before.call
-				
-				RubyProf.measure_mode = measure_mode
+		def run_profile(name, measure_mode, options, &block)
+			puts "Running #{measure_names[measure_mode]} profile on #{name} #{options[:iterate] || 1} time(s)..."
+			@before.call
+			
+			RubyProf.measure_mode = measure_mode
+			if options[:iterate].nil?
 				RubyProf.start
 				yield
 				result = RubyProf.stop
-			  printer = RubyProf::GraphHtmlPrinter.new(result)
-
-				FileUtils.mkdir_p "#{File.dirname(__FILE__)}/results/#{name}"
-				File.open("#{File.dirname(__FILE__)}/results/#{name}/#{measurement_names[measure_mode]}_#{Time.now}.html", 'w') {|file| printer.print(file)}
+			else
+				RubyProf.start
+				options[:iterate].times { yield }
+				result = RubyProf.stop
 			end
+		  printer = RubyProf::GraphHtmlPrinter.new(result)
 
+			FileUtils.mkdir_p "#{File.dirname(__FILE__)}/results/#{name}"
+			File.open("#{File.dirname(__FILE__)}/results/#{name}/#{measure_names[measure_mode]}_#{Time.now}.html", 'w') {|file| printer.print(file)}
 		end
+
 	end
 end
