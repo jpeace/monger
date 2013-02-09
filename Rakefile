@@ -22,3 +22,8 @@ desc "Run specs"
 RSpec::Core::RakeTask.new do |t|
   t.rspec_opts = '-dcfd'
 end
+
+desc "Run benchmark tests"
+task :benchmark do
+	require_relative "#{File.dirname(__FILE__)}/spec/benchmark/mongo/api_benchmark"
+end
