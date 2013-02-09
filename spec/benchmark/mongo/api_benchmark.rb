@@ -10,9 +10,6 @@ profiler.before_each do
 	config = ::Monger.bootstrap("#{::File.dirname(__FILE__)}/../../environment/config/monger.rb")
 	session = ::Monger.create_session(config)
   @api = session.mongo
-  @post = build_post
-  @post_doc = build_post_doc
-	@post_map = config.maps[:blog_post]
 end
 
 profiler.profile_process_time('mongo/api/#find_by_id', iterate: 1000) do
