@@ -33,13 +33,9 @@ module Benchmark
 
 		private
 
-		def measure_names
-			{ RubyProf::PROCESS_TIME => 'process_time', RubyProf::MEMORY => 'memory', RubyProf::CPU_TIME => 'cpu', RubyProf::WALL_TIME => 'wall_time' }
-		end
-
 		def run_profile(name, measure_mode, options, &block)
 			puts "Running #{measure_names[measure_mode]} profile on #{name} #{options[:iterate] || 1} time(s)..."
-			@before.call
+			@before.call unless @before.nil?
 			
 			RubyProf.measure_mode = measure_mode
 			if options[:iterate].nil?
@@ -55,6 +51,10 @@ module Benchmark
 
 			FileUtils.mkdir_p "#{File.dirname(__FILE__)}/results/#{name}"
 			File.open("#{File.dirname(__FILE__)}/results/#{name}/#{measure_names[measure_mode]}_#{Time.now}.html", 'w') {|file| printer.print(file)}
+		end
+
+		def measure_names
+			{ RubyProf::PROCESS_TIME => 'process_time', RubyProf::MEMORY => 'memory', RubyProf::CPU_TIME => 'cpu', RubyProf::WALL_TIME => 'wall_time' }
 		end
 
 	end
