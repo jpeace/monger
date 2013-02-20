@@ -8,6 +8,10 @@ module Monger
         @db = ::Mongo::Connection.new(@config.host, @config.port).db(@config.database)
       end
 
+      def count(type, criteria={})
+        @db[type.to_s].count(:query => criteria)
+      end
+
       def find(type, criteria={}, options={})
         skip_hooks = options[:skip_hooks] || false
         @config.mongo_hooks[:before_read].each {|proc| proc.call(type, criteria)} unless skip_hooks

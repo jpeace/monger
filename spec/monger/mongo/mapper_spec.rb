@@ -521,4 +521,48 @@ describe Monger::Mongo::Mapper do
       find_in_db(:comment, comment_id).should be_nil
     end
   end
+
+  context "when counting" do
+    it "returns the number of documents in a collection" do
+      number_of_posts = subject.count(:blog_post)
+      post1 = Domain::BlogPost.new do |p|
+        p.title = 'Post1'
+      end
+      post2 = Domain::BlogPost.new do |p|
+        p.title = 'Post2'
+      end
+      post3 = Domain::BlogPost.new do |p|
+        p.title = 'Post3'
+      end
+      post4 = Domain::BlogPost.new do |p|
+        p.title = 'Post4'
+      end
+      subject.save(post1, :atomic => true)
+      subject.save(post2, :atomic => true)
+      subject.save(post3, :atomic => true)
+      subject.save(post4, :atomic => true)
+      
+      subject.count(:blog_post).should eq (number_of_posts + 4)   
+    end
+
+    it "supports criteria" do
+      t1 = Domain::Tag.new do |t|
+        t.name = 'Counted Tag'
+      end
+      t2 = Domain::Tag.new do |t|
+        t.name = 'Counted Tag'
+      end
+      t3 = Domain::Tag.new do |t|
+        t.name = 'Counted Tag'
+      end
+      t4 = Domain::Tag.new do |t|
+        t.name = 'Not Counted Tag'
+      end
+      subject.save(t1, :atomic => true)
+      subject.save(t2, :atomic => true)
+      subject.save(t3, :atomic => true)
+
+      subject.count(:tag, {:name => 'Counted Tag'}).should eq 3
+    end
+  end
 end

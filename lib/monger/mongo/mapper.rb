@@ -6,6 +6,10 @@ module Monger
         @db = Database.new(config)
       end
 
+      def count(type, criteria={})
+        @db.count(type, criteria)
+      end
+
       def find(type, criteria, options={})
         @db.find(type, criteria, options).map {|doc| doc_to_entity(type, doc, options)}
       end
