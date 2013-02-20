@@ -561,8 +561,14 @@ describe Monger::Mongo::Mapper do
       subject.save(t1, :atomic => true)
       subject.save(t2, :atomic => true)
       subject.save(t3, :atomic => true)
+      subject.save(t4, :atomic => true)
 
       subject.count(:tag, {:name => 'Counted Tag'}).should eq 3
+
+      subject.remove_entity(t1)
+      subject.remove_entity(t2)
+      subject.remove_entity(t3)
+      subject.remove_entity(t4)
     end
   end
 end
